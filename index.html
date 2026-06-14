@@ -3,1236 +3,977 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚓ Rules of the Road – Coast Guard Prep</title>
+<title>⚓ Rules of the Road — COLREGS Study Tool</title>
 <style>
   :root {
     --bg: #0a1628;
-    --bg2: #0f2040;
-    --bg3: #162b52;
-    --border: #1e3a6e;
+    --card: #112240;
+    --card2: #1a3050;
+    --text: #e8f4fd;
+    --text-muted: #8ab4d4;
     --gold: #f0c040;
-    --gold-dim: #b8922e;
-    --text: #e8edf5;
-    --text-dim: #8ba3c7;
-    --green: #22c55e;
-    --green-bg: #052e16;
-    --red: #ef4444;
-    --red-bg: #2d0b0b;
-    --white: #ffffff;
+    --gold-dark: #c89a20;
+    --correct: #22c55e;
+    --correct-bg: #14532d;
+    --wrong: #ef4444;
+    --wrong-bg: #7f1d1d;
+    --border: #1e3a5f;
     --radius: 12px;
     --radius-sm: 8px;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
-    font-size: 17px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 18px;
     line-height: 1.5;
-  }
-
-  #app {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 20px 16px 60px;
-  }
-
-  /* ── SCREENS ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* ── HEADER ── */
-  .app-header {
-    text-align: center;
-    padding: 32px 0 24px;
-  }
-  .app-header h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--gold);
-    letter-spacing: -0.5px;
-  }
-  .app-header p {
-    color: var(--text-dim);
-    margin-top: 6px;
-    font-size: 1rem;
-  }
-
-  /* ── STAT BAR ── */
-  .stat-bar {
+    min-height: 100vh;
     display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
   }
-  .stat-pill {
-    background: var(--bg3);
+
+  .screen { display: none; width: 100%; max-width: 620px; }
+  .screen.active { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── HOME SCREEN ── */
+  .home-header { text-align: center; padding: 24px 0 8px; }
+  .home-title { font-size: 2.4rem; font-weight: 800; color: var(--gold); letter-spacing: -0.5px; }
+  .home-subtitle { font-size: 1rem; color: var(--text-muted); margin-top: 6px; }
+
+  .card {
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 6px 16px;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-  }
-  .stat-pill span {
-    color: var(--gold);
-    font-weight: 700;
+    border-radius: var(--radius);
+    padding: 20px 22px;
   }
 
-  /* ── SECTION LABEL ── */
-  .section-label {
-    font-size: 0.8rem;
+  .card-label {
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
   }
 
-  /* ── TOPIC GRID ── */
-  .topic-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-  .topic-btn {
-    background: var(--bg2);
-    border: 2px solid var(--border);
+  select {
+    width: 100%;
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 12px 14px;
-    color: var(--text);
+    font-size: 1rem;
+    font-family: inherit;
     cursor: pointer;
-    text-align: left;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238ab4d4' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
   }
-  .topic-btn:hover {
-    border-color: var(--gold-dim);
-    background: var(--bg3);
-    transform: translateY(-1px);
-  }
-  .topic-btn.selected {
-    border-color: var(--gold);
-    background: var(--bg3);
-    color: var(--gold);
-  }
-  .topic-btn .topic-icon { font-size: 1.2rem; flex-shrink: 0; }
+  select:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-  /* ── LENGTH PICKER ── */
-  .length-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-  }
-  .len-btn {
+  .length-buttons { display: flex; gap: 10px; }
+  .length-btn {
     flex: 1;
-    min-width: 80px;
-    padding: 12px;
-    background: var(--bg2);
+    padding: 14px;
+    background: var(--card2);
     border: 2px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1.3;
+  }
+  .length-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .length-btn.selected { background: var(--gold); color: #0a1628; border-color: var(--gold); }
+
+  .streak-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .streak-icon { font-size: 1.6rem; }
+  .streak-info { flex: 1; }
+  .streak-label { font-size: 0.8rem; color: var(--text-muted); }
+  .streak-value { font-size: 1.4rem; font-weight: 800; color: var(--gold); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: var(--gold);
+    color: #0a1628;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: var(--gold-dark); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    padding: 13px 20px;
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    text-align: center;
-    transition: border-color 0.15s, background 0.15s;
+    transition: all 0.15s ease;
+    font-family: inherit;
   }
-  .len-btn:hover { border-color: var(--gold-dim); background: var(--bg3); }
-  .len-btn.selected { border-color: var(--gold); background: var(--bg3); color: var(--gold); }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
 
-  /* ── WEAK AREAS BANNER ── */
-  .weak-banner {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border: 1px solid #4a3f6b;
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .weak-banner .weak-text { font-size: 0.95rem; color: #c4b5fd; }
-  .weak-banner .weak-count { font-weight: 700; color: #a78bfa; }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-block;
-    padding: 13px 28px;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    text-align: center;
-    transition: transform 0.1s, opacity 0.15s;
-    text-decoration: none;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary {
-    background: var(--gold);
-    color: #0a1628;
+  .weak-btn {
     width: 100%;
-    font-size: 1.1rem;
-    padding: 15px;
-  }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-secondary {
-    background: var(--bg3);
-    color: var(--text);
-    border: 2px solid var(--border);
-  }
-  .btn-secondary:hover { border-color: var(--gold-dim); }
-  .btn-ghost {
+    padding: 13px;
     background: transparent;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
   }
-  .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
-  .btn-weak {
-    background: #4c1d95;
-    color: #e9d5ff;
-    border: 1px solid #7c3aed;
-  }
-  .btn-weak:hover { background: #5b21b6; }
+  .weak-btn:hover { border-color: #f97316; color: #f97316; }
+  .weak-btn.hidden { display: none; }
 
-  /* ── QUIZ HEADER ── */
+  /* ── QUIZ SCREEN ── */
   .quiz-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
+    padding: 8px 0;
   }
-  .quiz-counter {
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    font-weight: 600;
-  }
-  .streak-badge {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 5px 14px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--gold);
-  }
-
-  /* ── PROGRESS BAR ── */
-  .progress-wrap {
-    background: var(--bg3);
-    border-radius: 50px;
-    height: 8px;
-    margin-bottom: 24px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-    border-radius: 50px;
-    transition: width 0.4s ease;
-  }
-
-  /* ── QUESTION CARD ── */
-  .question-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 20px;
-  }
-  .topic-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  .question-text {
-    font-size: 1.15rem;
-    font-weight: 600;
-    line-height: 1.5;
-    color: var(--white);
-  }
-
-  /* ── ANSWER OPTIONS ── */
-  .options-grid {
+  .quiz-streak {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .option-btn {
-    background: var(--bg2);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    color: var(--text);
-    cursor: pointer;
-    text-align: left;
-    font-size: 1rem;
-    line-height: 1.4;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
-    width: 100%;
-  }
-  .option-btn:hover:not(:disabled) {
-    border-color: var(--gold-dim);
-    background: var(--bg3);
-    transform: translateX(2px);
-  }
-  .option-btn:disabled { cursor: default; }
-  .option-label {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    flex-shrink: 0;
-    width: 22px;
-    margin-top: 1px;
-  }
-  .option-btn.correct {
-    border-color: var(--green);
-    background: var(--green-bg);
-    color: var(--green);
-  }
-  .option-btn.correct .option-label { color: var(--green); }
-  .option-btn.wrong {
-    border-color: var(--red);
-    background: var(--red-bg);
-    color: var(--red);
-  }
-  .option-btn.wrong .option-label { color: var(--red); }
-  .option-btn.dimmed { opacity: 0.45; }
-
-  /* ── FEEDBACK ── */
-  .feedback-box {
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    margin-bottom: 16px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    display: none;
-  }
-  .feedback-box.show { display: block; }
-  .feedback-box.correct-fb {
-    background: var(--green-bg);
-    border: 1px solid var(--green);
-    color: #86efac;
-  }
-  .feedback-box.wrong-fb {
-    background: var(--red-bg);
-    border: 1px solid var(--red);
-    color: #fca5a5;
-  }
-  .feedback-title {
-    font-weight: 700;
-    font-size: 1.05rem;
-    margin-bottom: 6px;
-  }
-
-  /* ── END SCREEN ── */
-  .end-card {
-    text-align: center;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 36px 24px;
-    margin-bottom: 24px;
-  }
-  .end-emoji { font-size: 3.5rem; margin-bottom: 12px; }
-  .end-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
-  .end-score {
-    font-size: 3rem;
-    font-weight: 900;
-    color: var(--white);
-    margin: 16px 0;
-    letter-spacing: -1px;
-  }
-  .end-score span { color: var(--gold); }
-  .end-message {
-    font-size: 1rem;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-  .end-streak {
-    display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 8px 20px;
-    font-size: 0.95rem;
-    color: var(--gold);
+    font-size: 1rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    color: var(--gold);
   }
-  .end-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .end-actions .btn { width: 100%; }
+  .quiz-score { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+  .quiz-counter { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
 
-  /* ── WRONG LIST ── */
-  .missed-section {
-    margin-top: 24px;
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
   }
-  .missed-item {
-    background: var(--bg2);
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #f97316);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .topic-badge {
+    display: inline-block;
+    background: rgba(240, 192, 64, 0.15);
+    color: var(--gold);
+    border: 1px solid rgba(240, 192, 64, 0.3);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .answer-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+  .answer-btn {
+    width: 100%;
+    padding: 16px 18px;
+    background: var(--card2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    text-align: left;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .answer-btn:hover:not(:disabled) { border-color: var(--gold); background: rgba(240,192,64,0.07); }
+  .answer-btn:disabled { cursor: default; }
+
+  .answer-btn .letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    font-size: 0.85rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .answer-btn.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+    color: #bbf7d0;
+  }
+  .answer-btn.correct .letter { background: var(--correct); color: #fff; }
+
+  .answer-btn.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong);
+    color: #fecaca;
+  }
+  .answer-btn.wrong .letter { background: var(--wrong); color: #fff; }
+
+  .answer-btn.dim { opacity: 0.35; }
+
+  .feedback-box {
+    display: none;
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    padding: 16px 18px;
+    gap: 8px;
+    flex-direction: column;
   }
-  .missed-item .missed-q { color: var(--text); font-weight: 600; margin-bottom: 4px; }
-  .missed-item .missed-a { color: var(--green); font-size: 0.85rem; }
+  .feedback-box.show { display: flex; }
 
-  /* ── TOPIC COLORS ── */
-  .badge-lights     { background: #1e3a5f; color: #60a5fa; }
-  .badge-sound      { background: #1a2d1a; color: #4ade80; }
-  .badge-hierarchy  { background: #2d1a1a; color: #f87171; }
-  .badge-situations { background: #2d2a0f; color: #fbbf24; }
-  .badge-fog        { background: #1a1a2e; color: #a78bfa; }
-  .badge-definitions{ background: #0f2d2d; color: #34d399; }
-  .badge-lookout    { background: #2d1f0a; color: #fb923c; }
-  .badge-safespeed  { background: #1f0a2d; color: #c084fc; }
-  .badge-collision  { background: #0a2d1a; color: #6ee7b7; }
-  .badge-action     { background: #2d0a0a; color: #fca5a5; }
-  .badge-narrow     { background: #0a1f2d; color: #7dd3fc; }
-  .badge-tss        { background: #1f2d0a; color: #bef264; }
-  .badge-anchor     { background: #2d200a; color: #fcd34d; }
-  .badge-dayshapes  { background: #200a2d; color: #d8b4fe; }
-
-  /* ── DIVIDER ── */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 24px 0;
+  .feedback-result {
+    font-size: 1.05rem;
+    font-weight: 800;
   }
+  .feedback-result.correct { color: var(--correct); }
+  .feedback-result.wrong { color: var(--wrong); }
 
-  /* ── HOME BACK BTN ── */
-  .back-row {
-    margin-bottom: 20px;
-  }
+  .feedback-explanation { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
 
-  /* ── ANIMATION ── */
-  @keyframes pop {
-    0% { transform: scale(0.95); opacity: 0; }
-    60% { transform: scale(1.02); }
-    100% { transform: scale(1); opacity: 1; }
+  .btn-next {
+    width: 100%;
+    padding: 15px;
+    background: var(--card2);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius-sm);
+    color: var(--gold);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    display: none;
   }
-  .pop { animation: pop 0.25s ease forwards; }
+  .btn-next.show { display: block; }
+  .btn-next:hover { background: var(--gold); color: #0a1628; }
+
+  /* ── END SCREEN ── */
+  .end-header { text-align: center; padding: 12px 0; }
+  .end-emoji { font-size: 3.5rem; display: block; margin-bottom: 10px; }
+  .end-score { font-size: 2.4rem; font-weight: 900; color: var(--gold); }
+  .end-score-label { font-size: 1rem; color: var(--text-muted); margin-top: 4px; }
+  .end-message { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-top: 10px; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-box {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--gold); }
+  .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+  .end-actions { display: flex; gap: 12px; }
+  .end-actions .btn-secondary { flex: 1; text-align: center; }
+  .end-actions .btn-primary { flex: 2; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 480px) {
-    .app-header h1 { font-size: 1.8rem; }
+    body { font-size: 16px; padding: 10px; }
+    .home-title { font-size: 1.9rem; }
     .question-text { font-size: 1.05rem; }
-    .end-score { font-size: 2.4rem; }
-    .topic-grid { grid-template-columns: 1fr 1fr; }
+    .answer-btn { padding: 13px 12px; font-size: 0.92rem; }
+    .end-score { font-size: 2rem; }
   }
+
+  /* pulse animation for correct answer */
+  @keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+  .answer-btn.correct { animation: pulse-green 0.5s ease; }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- ════════════════════════════════════ HOME SCREEN ════════════════════════════════════ -->
-  <div id="screen-home" class="screen active">
-    <div class="app-header">
-      <h1>⚓ Rules of the Road</h1>
-      <p>Coast Guard COLREGS &amp; Inland Rules Study Tool</p>
-    </div>
-
-    <div class="stat-bar">
-      <div class="stat-pill">🔥 Best Streak: <span id="home-best-streak">0</span></div>
-      <div class="stat-pill">📚 Questions: <span>45</span></div>
-      <div class="stat-pill">❓ Topics: <span>14</span></div>
-    </div>
-
-    <div id="weak-banner" class="weak-banner" style="display:none;">
-      <div class="weak-text">⚡ You have <span class="weak-count" id="weak-count">0</span> question(s) marked for review</div>
-      <button class="btn btn-weak" onclick="startWeakAreas()">Practice Weak Areas</button>
-    </div>
-
-    <div class="section-label">Choose a Topic</div>
-    <div class="topic-grid" id="topic-grid">
-      <!-- filled by JS -->
-    </div>
-
-    <div class="section-label">Session Length</div>
-    <div class="length-row">
-      <button class="len-btn" data-len="5" onclick="selectLength(5)">5</button>
-      <button class="len-btn selected" data-len="10" onclick="selectLength(10)">10</button>
-      <button class="len-btn" data-len="15" onclick="selectLength(15)">15</button>
-    </div>
-
-    <button class="btn btn-primary" id="start-btn" onclick="startQuiz(false)">🚢 Start Quiz</button>
+<!-- ══════════════════════════════════════
+     HOME SCREEN
+══════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="home-header">
+    <div class="home-title">⚓ Rules of the Road</div>
+    <div class="home-subtitle">COLREGS &amp; Inland Rules — Interactive Study Tool</div>
   </div>
 
-  <!-- ════════════════════════════════════ QUIZ SCREEN ════════════════════════════════════ -->
-  <div id="screen-quiz" class="screen">
-    <div class="back-row">
-      <button class="btn btn-ghost" onclick="goHome()" style="padding:8px 16px;font-size:0.85rem;">← Home</button>
-    </div>
-
-    <div class="quiz-header">
-      <div class="quiz-counter">Question <span id="q-current">1</span> of <span id="q-total">10</span></div>
-      <div class="streak-badge">🔥 Streak: <span id="q-streak">0</span></div>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-
-    <div class="question-card" id="question-card">
-      <div class="topic-badge" id="topic-badge">Topic</div>
-      <div class="question-text" id="question-text">Loading…</div>
-    </div>
-
-    <div class="options-grid" id="options-grid">
-      <!-- filled by JS -->
-    </div>
-
-    <div class="feedback-box" id="feedback-box">
-      <div class="feedback-title" id="feedback-title"></div>
-      <div id="feedback-explanation"></div>
-    </div>
-
-    <button class="btn btn-primary" id="next-btn" style="display:none;" onclick="nextQuestion()">Next Question →</button>
+  <div class="card">
+    <div class="card-label">Select Topic</div>
+    <select id="topic-select">
+      <option value="all">🌊 Mixed (All Topics)</option>
+      <option value="weak" id="opt-weak">⚠️ Practice Weak Areas</option>
+      <option value="Navigation Lights">💡 Navigation Lights</option>
+      <option value="Sound Signals">📢 Sound Signals</option>
+      <option value="Vessel Hierarchy">⚖️ Vessel Hierarchy</option>
+      <option value="Crossing &amp; Meeting">⛵ Crossing &amp; Meeting</option>
+      <option value="Restricted Visibility">🌫️ Restricted Visibility</option>
+      <option value="Definitions">📖 Definitions</option>
+      <option value="Lookout &amp; Safe Speed">👁️ Lookout &amp; Safe Speed</option>
+      <option value="Risk of Collision">⚠️ Risk of Collision</option>
+      <option value="Action to Avoid Collision">🔄 Action to Avoid Collision</option>
+      <option value="Narrow Channels">🚢 Narrow Channels</option>
+      <option value="Traffic Separation">🛣️ Traffic Separation</option>
+      <option value="Anchoring &amp; Day Shapes">⚓ Anchoring &amp; Day Shapes</option>
+    </select>
   </div>
 
-  <!-- ════════════════════════════════════ END SCREEN ════════════════════════════════════ -->
-  <div id="screen-end" class="screen">
-    <div class="end-card pop" id="end-card">
-      <div class="end-emoji" id="end-emoji">🎉</div>
-      <div class="end-title" id="end-title">Session Complete!</div>
-      <div class="end-score"><span id="end-correct">0</span> / <span id="end-total">0</span></div>
-      <div class="end-message" id="end-message"></div>
-      <div class="end-streak">🔥 Best streak this session: <span id="end-streak">0</span></div>
-    </div>
-
-    <div class="end-actions">
-      <button class="btn btn-primary" onclick="retrySession()">🔄 Try Again (Same Topic)</button>
-      <button class="btn btn-secondary" onclick="goHome()">📚 Pick New Topic</button>
-    </div>
-
-    <div id="missed-section" class="missed-section" style="display:none;">
-      <hr class="divider">
-      <div class="section-label">Questions You Missed This Session</div>
-      <div id="missed-list"></div>
+  <div class="card">
+    <div class="card-label">Session Length</div>
+    <div class="length-buttons">
+      <button class="length-btn selected" data-len="5">5<br><span style="font-size:0.7rem;font-weight:400">Quick</span></button>
+      <button class="length-btn" data-len="10">10<br><span style="font-size:0.7rem;font-weight:400">Standard</span></button>
+      <button class="length-btn" data-len="15">15<br><span style="font-size:0.7rem;font-weight:400">Deep Dive</span></button>
     </div>
   </div>
 
-</div><!-- #app -->
+  <div class="streak-display">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-info">
+      <div class="streak-label">All-Time Best Streak</div>
+      <div class="streak-value" id="home-best-streak">0</div>
+    </div>
+    <div style="color:var(--text-muted);font-size:0.85rem;text-align:right;" id="home-wrong-count"></div>
+  </div>
+
+  <button class="btn-primary" id="btn-start">Start Quiz →</button>
+  <button class="weak-btn hidden" id="btn-weak-home">⚠️ Practice Weak Areas (<span id="weak-count">0</span> questions to review)</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     QUIZ SCREEN
+══════════════════════════════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-streak">🔥 <span id="quiz-streak">0</span></div>
+    <div class="quiz-counter" id="quiz-counter">Q 1 of 10</div>
+    <div class="quiz-score" id="quiz-score">✓ 0</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar"></div>
+  </div>
+
+  <div class="card" id="question-card">
+    <div class="topic-badge" id="topic-badge">Topic</div>
+    <div class="question-text" id="question-text">Loading question…</div>
+  </div>
+
+  <div class="answer-buttons" id="answer-buttons"></div>
+
+  <div class="feedback-box" id="feedback-box">
+    <div class="feedback-result" id="feedback-result"></div>
+    <div class="feedback-explanation" id="feedback-explanation"></div>
+  </div>
+
+  <button class="btn-next" id="btn-next">Next Question →</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     END SCREEN
+══════════════════════════════════════ -->
+<div id="screen-end" class="screen">
+  <div class="card end-header">
+    <span class="end-emoji" id="end-emoji">🎉</span>
+    <div class="end-score" id="end-score">8 / 10</div>
+    <div class="end-score-label">Questions Correct</div>
+    <div class="end-message" id="end-message">Great work!</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-value" id="end-streak">0</div>
+      <div class="stat-label">Best Streak This Session</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="end-pct">0%</div>
+      <div class="stat-label">Score This Session</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="end-all-time-streak">0</div>
+      <div class="stat-label">All-Time Best Streak</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="end-weak">0</div>
+      <div class="stat-label">Total Questions to Review</div>
+    </div>
+  </div>
+
+  <div class="end-actions">
+    <button class="btn-secondary" id="btn-home">🏠 Home</button>
+    <button class="btn-primary" id="btn-retry">Retry Same Topic →</button>
+  </div>
+</div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-//  QUESTION BANK
-// ══════════════════════════════════════════════════════════════════
-const QUESTIONS = [
-  // ── NAVIGATION LIGHTS ──
+// ═══════════════════════════════════════════════════
+//  QUESTION BANK — 55 Questions
+// ═══════════════════════════════════════════════════
+const ALL_QUESTIONS = [
+  // ── NAVIGATION LIGHTS (8) ──
   {
-    id: "nl01", topic: "Navigation Lights", badge: "badge-lights",
+    id: 1,
+    topic: "Navigation Lights",
     question: "What color is the starboard sidelight?",
-    options: ["Red", "Green", "White", "Yellow"],
-    correct: 1,
-    explanation: "The starboard (right) sidelight is GREEN. A helpful memory trick: green = go, and starboard is your clear side. Port (left) is red."
+    options: ["A. Red", "B. White", "C. Green", "D. Yellow"],
+    correct: 2,
+    explanation: "Starboard (right) sidelight is green, port (left) is red. Remember: 'Red = Port = Left' or the phrase 'There's no red port wine left.'"
   },
   {
-    id: "nl02", topic: "Navigation Lights", badge: "badge-lights",
-    question: "What is the arc of visibility for each sidelight (red/green)?",
-    options: ["360 degrees", "225 degrees", "135 degrees", "112.5 degrees"],
+    id: 2,
+    topic: "Navigation Lights",
+    question: "What is the arc of visibility for sidelights?",
+    options: ["A. 90 degrees", "B. 112.5 degrees", "C. 135 degrees", "D. 180 degrees"],
+    correct: 1,
+    explanation: "Sidelights (red and green) each cover an arc of 112.5 degrees from dead ahead to 22.5 degrees abaft the beam."
+  },
+  {
+    id: 3,
+    topic: "Navigation Lights",
+    question: "A power-driven vessel underway must show what lights at night?",
+    options: ["A. Sidelights and sternlight only", "B. Masthead light, sidelights, and sternlight", "C. Two masthead lights and sidelights only", "D. All-round white light and sidelights"],
+    correct: 1,
+    explanation: "A power-driven vessel underway shows a white masthead light (or lights), red/green sidelights, and a white sternlight."
+  },
+  {
+    id: 4,
+    topic: "Navigation Lights",
+    question: "What is the arc of visibility for a sternlight?",
+    options: ["A. 112.5 degrees", "B. 120 degrees", "C. 135 degrees", "D. 360 degrees"],
+    correct: 2,
+    explanation: "The sternlight covers 135 degrees centered on dead astern — 67.5 degrees on each side of the centerline."
+  },
+  {
+    id: 5,
+    topic: "Navigation Lights",
+    question: "A vessel showing a yellow sternlight (instead of white) is:",
+    options: ["A. A towing vessel", "B. A vessel being towed", "C. A pilot vessel", "D. A vessel constrained by draft"],
+    correct: 1,
+    explanation: "A vessel being towed astern shows a yellow sternlight instead of the usual white sternlight."
+  },
+  {
+    id: 6,
+    topic: "Navigation Lights",
+    question: "A towing vessel displaying a yellow towing light above the sternlight has a tow that is:",
+    options: ["A. Less than 100 meters", "B. Less than 200 meters", "C. Greater than 200 meters", "D. Greater than 500 meters"],
+    correct: 2,
+    explanation: "A second yellow towing light is shown above the sternlight when the length of the tow exceeds 200 meters."
+  },
+  {
+    id: 7,
+    topic: "Navigation Lights",
+    question: "What lights does an anchored vessel less than 50 meters show at night?",
+    options: ["A. Two all-round white lights", "B. Sidelights and sternlight", "C. One all-round white light", "D. One all-round red light"],
+    correct: 2,
+    explanation: "A vessel at anchor less than 50m shows one all-around white light where it can best be seen."
+  },
+  {
+    id: 8,
+    topic: "Navigation Lights",
+    question: "A vessel Not Under Command (NUC) shows:",
+    options: ["A. Two all-round red lights in a vertical line", "B. One all-round red light", "C. Two all-round white lights", "D. A flashing yellow light"],
+    correct: 0,
+    explanation: "An NUC vessel shows two all-around red lights in a vertical line, plus sidelights and sternlight if making way through the water."
+  },
+
+  // ── SOUND SIGNALS (7) ──
+  {
+    id: 9,
+    topic: "Sound Signals",
+    question: "One short blast on the whistle means:",
+    options: ["A. I am altering course to port", "B. I am operating astern", "C. I am altering course to starboard", "D. I am in distress"],
+    correct: 2,
+    explanation: "In sight of another vessel, one short blast means 'I intend to turn to starboard.' This applies under both COLREGS and Inland Rules."
+  },
+  {
+    id: 10,
+    topic: "Sound Signals",
+    question: "Two short blasts on the whistle means:",
+    options: ["A. I am altering course to starboard", "B. I am altering course to port", "C. I am operating astern", "D. I am in danger"],
+    correct: 1,
+    explanation: "Two short blasts = 'I intend to turn to port.' Three short blasts = 'I am operating astern propulsion.'"
+  },
+  {
+    id: 11,
+    topic: "Sound Signals",
+    question: "Three short blasts means:",
+    options: ["A. I am turning to starboard", "B. I am turning to port", "C. I am operating my engines astern", "D. I am in danger — stand clear"],
+    correct: 2,
+    explanation: "Three short blasts signals that your engines are in reverse (operating astern). It does NOT necessarily mean the vessel is yet moving backward."
+  },
+  {
+    id: 12,
+    topic: "Sound Signals",
+    question: "Five or more short and rapid blasts means:",
+    options: ["A. I am anchoring", "B. I am reversing course", "C. I am in distress", "D. Danger or doubt signal"],
     correct: 3,
-    explanation: "Sidelights cover 112.5 degrees each — from dead ahead to 22.5 degrees abaft the beam on their respective sides. Together with the sternlight (135°) they cover the full circle."
+    explanation: "Five or more short rapid blasts is the danger/doubt signal — meaning 'I am in doubt about your intentions' or that danger exists."
   },
   {
-    id: "nl03", topic: "Navigation Lights", badge: "badge-lights",
-    question: "A power-driven vessel underway at night must display which combination of lights?",
-    options: [
-      "Masthead light(s), sidelights, and sternlight",
-      "Sidelights only",
-      "Masthead light and sternlight only",
-      "All-round white light only"
-    ],
-    correct: 0,
-    explanation: "Power-driven vessels show masthead light(s) forward, red/green sidelights, and a white sternlight. Sailing vessels do NOT show masthead lights unless also using the engine."
-  },
-  {
-    id: "nl04", topic: "Navigation Lights", badge: "badge-lights",
-    question: "What is the arc of the sternlight?",
-    options: ["360 degrees", "225 degrees", "135 degrees", "112.5 degrees"],
+    id: 13,
+    topic: "Sound Signals",
+    question: "In a narrow channel (Inland Rules), a vessel wishing to overtake on the other vessel's starboard side signals:",
+    options: ["A. One prolonged blast", "B. Two short blasts", "C. Two prolonged and one short blast", "D. One prolonged and two short blasts"],
     correct: 2,
-    explanation: "The sternlight is white and covers 135 degrees centered on dead astern (67.5 degrees on each side). Combined with both sidelights at 112.5 degrees each, the full 360 degrees is covered."
+    explanation: "Two prolonged + one short blast signals intent to overtake on the starboard side. The overtaken vessel agrees by returning the same signal."
   },
   {
-    id: "nl05", topic: "Navigation Lights", badge: "badge-lights",
-    question: "A vessel Not Under Command (NUC) displays which lights at night?",
-    options: [
-      "Two all-round RED lights in a vertical line",
-      "Two all-round GREEN lights in a vertical line",
-      "Three all-round red lights",
-      "One all-round red and one all-round white"
-    ],
-    correct: 0,
-    explanation: "A NUC vessel shows two all-round RED lights in a vertical line, plus sidelights and sternlight if making way. Red lights signal danger and inability to maneuver."
+    id: 14,
+    topic: "Sound Signals",
+    question: "How long is a 'prolonged blast'?",
+    options: ["A. 1–2 seconds", "B. 2–3 seconds", "C. 4–6 seconds", "D. 8–10 seconds"],
+    correct: 2,
+    explanation: "A prolonged blast lasts 4 to 6 seconds. A short blast lasts approximately 1 second."
   },
   {
-    id: "nl06", topic: "Navigation Lights", badge: "badge-lights",
-    question: "What lights does an anchored vessel (50m or more in length) show at night?",
-    options: [
-      "One all-round white light forward and one all-round white light aft (lower than forward)",
-      "Two all-round red lights in a vertical line",
-      "Sidelights only",
-      "Masthead light and sternlight"
-    ],
-    correct: 0,
-    explanation: "Vessels 50m or more at anchor show an all-round white light forward AND another all-round white light aft, lower than the forward light. Smaller vessels need only the forward all-round white light."
-  },
-  {
-    id: "nl07", topic: "Navigation Lights", badge: "badge-lights",
-    question: "A sailing vessel underway at night must show:",
-    options: [
-      "Sidelights and sternlight only (NO masthead light)",
-      "All the same lights as a power-driven vessel",
-      "Only a single all-round white light",
-      "Masthead light, sidelights, and sternlight"
-    ],
-    correct: 0,
-    explanation: "A sailing vessel shows sidelights and sternlight but NO masthead (steaming) light. If using its engine (even with sails up), it becomes a power-driven vessel and must show a masthead light plus a cone day shape."
-  },
-  {
-    id: "nl08", topic: "Navigation Lights", badge: "badge-lights",
-    question: "A vessel engaged in towing shows which forward masthead lights?",
-    options: [
-      "Two in a vertical line (three if the tow exceeds 200m), plus sidelights, sternlight, and yellow towing light",
-      "Only one masthead light, same as any power vessel",
-      "Red and green lights only",
-      "A single yellow light at the masthead"
-    ],
-    correct: 0,
-    explanation: "A towing vessel shows two masthead lights forward (three if tow exceeds 200m), plus sidelights, sternlight, and a yellow towing light above the sternlight. The yellow towing light has the same 135-degree arc as the sternlight."
-  },
-  {
-    id: "nl09", topic: "Navigation Lights", badge: "badge-lights",
-    question: "What is the arc of a masthead (steaming) light?",
-    options: ["360 degrees", "225 degrees", "135 degrees", "112.5 degrees"],
+    id: 15,
+    topic: "Sound Signals",
+    question: "A power-driven vessel making way in restricted visibility must sound:",
+    options: ["A. Two prolonged blasts every 2 minutes", "B. One prolonged blast at intervals of not more than 2 minutes", "C. One short blast every minute", "D. One prolonged and two short blasts every 2 minutes"],
     correct: 1,
-    explanation: "A masthead light covers 225 degrees — from dead ahead to 22.5 degrees abaft the beam on BOTH sides. This is why you can see it from in front and both sides but not from directly astern."
+    explanation: "A power-driven vessel making way in restricted visibility sounds one prolonged blast at intervals of not more than 2 minutes."
   },
 
-  // ── SOUND SIGNALS ──
+  // ── VESSEL HIERARCHY (6) ──
   {
-    id: "ss01", topic: "Sound Signals", badge: "badge-sound",
-    question: "When vessels are in sight of one another, one short blast means:",
-    options: [
-      "I am turning to port (left)",
-      "I am altering my course to starboard (right)",
-      "My engines are going astern",
-      "I am in doubt of your intentions"
-    ],
-    correct: 1,
-    explanation: "One short blast (Inland Rules maneuvering signal) means 'I am altering my course to STARBOARD.' Two short = altering to port. Under COLREGS, one blast also means turning starboard."
-  },
-  {
-    id: "ss02", topic: "Sound Signals", badge: "badge-sound",
-    question: "Three short blasts on the whistle means:",
-    options: [
-      "Danger — stand clear",
-      "Altering course to port",
-      "My engines are going astern",
-      "I intend to overtake on your starboard side"
-    ],
-    correct: 2,
-    explanation: "Three short blasts = 'I am operating my engines astern.' This is not necessarily that the vessel is moving backwards yet — it's that the engines are in reverse. The vessel may still be moving forward."
-  },
-  {
-    id: "ss03", topic: "Sound Signals", badge: "badge-sound",
-    question: "Five or more short and rapid blasts signals:",
-    options: [
-      "Leaving a dock or berth",
-      "Operating in restricted visibility",
-      "Danger or doubt — I do not understand your intentions",
-      "I am constrained by draft"
-    ],
-    correct: 2,
-    explanation: "Five or more short rapid blasts is the DANGER/DOUBT signal. Use it any time you are uncertain of another vessel's intentions or believe danger of collision exists. It's the universal 'something is wrong' signal."
-  },
-  {
-    id: "ss04", topic: "Sound Signals", badge: "badge-sound",
-    question: "In restricted visibility, a power-driven vessel making way sounds:",
-    options: [
-      "One prolonged blast at intervals not more than 2 minutes",
-      "Two prolonged blasts every 2 minutes",
-      "One prolonged blast every minute",
-      "Three short blasts every 2 minutes"
-    ],
-    correct: 0,
-    explanation: "A power-driven vessel making way through the water in restricted visibility sounds ONE PROLONGED blast at intervals not more than 2 minutes. Think: 'one blast = moving.'"
-  },
-  {
-    id: "ss05", topic: "Sound Signals", badge: "badge-sound",
-    question: "In restricted visibility, a power-driven vessel underway but NOT making way (stopped) sounds:",
-    options: [
-      "One prolonged blast every 2 minutes",
-      "Two prolonged blasts with about 2 seconds between them, every 2 minutes",
-      "One short blast every minute",
-      "Rapid ringing of a bell"
-    ],
-    correct: 1,
-    explanation: "A power vessel underway but NOT making way sounds TWO PROLONGED blasts with ~2 seconds between them, every 2 minutes. Think: 'two blasts = stopped.' One blast = making way, two blasts = stopped."
-  },
-  {
-    id: "ss06", topic: "Sound Signals", badge: "badge-sound",
-    question: "A sailing vessel underway in restricted visibility sounds:",
-    options: [
-      "One prolonged blast every 2 minutes",
-      "One prolonged and two short blasts every 2 minutes",
-      "Three short blasts every minute",
-      "Two prolonged blasts every 2 minutes"
-    ],
-    correct: 1,
-    explanation: "Sailing vessels, NUC, RAM, vessels restricted by draft, fishing vessels, and vessels being towed all sound ONE PROLONGED + TWO SHORT blasts (·- -) at intervals not more than 2 minutes."
-  },
-  {
-    id: "ss07", topic: "Sound Signals", badge: "badge-sound",
-    question: "Under Inland Rules, when overtaking in a narrow channel, what does the overtaking vessel sound to request passing on the vessel's STARBOARD side?",
-    options: [
-      "One prolonged blast",
-      "Two short blasts",
-      "One long blast and one short blast",
-      "Two long blasts and two short blasts"
-    ],
-    correct: 2,
-    explanation: "Inland Rules narrow-channel overtaking: ONE LONG + ONE SHORT = request to pass on overtaken vessel's starboard side. TWO LONG + TWO SHORT = request to pass on port side. The overtaken vessel must reply to agree."
-  },
-
-  // ── VESSEL HIERARCHY ──
-  {
-    id: "vh01", topic: "Vessel Hierarchy", badge: "badge-hierarchy",
-    question: "Which vessel type has the HIGHEST priority (most stand-on rights) under the rules?",
-    options: [
-      "Sailing vessel",
-      "Vessel Not Under Command (NUC)",
-      "Vessel constrained by draft",
-      "Fishing vessel with gear deployed"
-    ],
-    correct: 1,
-    explanation: "NUC (Not Under Command) vessels have the highest priority because they literally cannot maneuver. The full hierarchy (high to low): NUC → RAM → Constrained by Draft → Fishing → Sailing → Power-driven."
-  },
-  {
-    id: "vh02", topic: "Vessel Hierarchy", badge: "badge-hierarchy",
-    question: "A power-driven vessel must give way to all of the following EXCEPT:",
-    options: [
-      "Sailing vessels",
-      "Fishing vessels with gear out",
-      "Vessels not under command",
-      "Another power-driven vessel that is the stand-on vessel in a crossing situation"
-    ],
+    id: 16,
+    topic: "Vessel Hierarchy",
+    question: "Which vessel has the HIGHEST priority (most restricted in ability to maneuver)?",
+    options: ["A. Sailing vessel", "B. Vessel engaged in fishing", "C. Vessel Restricted in Ability to Maneuver (RAM)", "D. Vessel Not Under Command (NUC)"],
     correct: 3,
-    explanation: "Power-driven vessels give way to NUC, RAM, constrained by draft, fishing, and sailing vessels. In a crossing situation between two power-driven vessels, crossing rules (Rule 15) determine who yields — it's not automatic."
+    explanation: "The hierarchy from most to least restricted: NUC > RAM > Constrained by Draft > Fishing > Sailing > Power-driven. NUC has top priority."
   },
   {
-    id: "vh03", topic: "Vessel Hierarchy", badge: "badge-hierarchy",
-    question: "What does RAM stand for and what does it mean?",
-    options: [
-      "Rapid Approaching Motorvessel — a fast power vessel",
-      "Restricted in Ability to Maneuver — a vessel whose work limits its ability to keep clear",
-      "Radar-Assisted Maneuvering — a vessel using radar for navigation",
-      "Running Aground Marker — a vessel in shallow water"
-    ],
+    id: 17,
+    topic: "Vessel Hierarchy",
+    question: "A sailing vessel must give way to which of the following?",
+    options: ["A. All power-driven vessels", "B. Vessels Not Under Command and vessels Restricted in Ability to Maneuver", "C. Fishing vessels only", "D. No other vessel type"],
     correct: 1,
-    explanation: "RAM = Restricted in Ability to Maneuver. Examples include dredgers, cable layers, vessels conducting surveys, mineclearance, or vessels transferring personnel/cargo/fuel while underway. Their work prevents them from maneuvering freely."
+    explanation: "Sailing vessels must give way to NUC, RAM, and vessels constrained by draft. Power-driven vessels must give way to sailing vessels (except in narrow channels or TSS)."
   },
   {
-    id: "vh04", topic: "Vessel Hierarchy", badge: "badge-hierarchy",
-    question: "Which vessel must give way to a fishing vessel that has its nets deployed?",
-    options: [
-      "NUC vessel",
-      "RAM vessel",
-      "Sailing vessel",
-      "Power-driven vessel"
-    ],
+    id: 18,
+    topic: "Vessel Hierarchy",
+    question: "In a crossing situation between two power-driven vessels, which is the stand-on vessel?",
+    options: ["A. The vessel on the port side of the other", "B. The larger vessel", "C. The vessel on the starboard side of the other vessel", "D. The faster vessel"],
+    correct: 2,
+    explanation: "The vessel that has the other on her own starboard side is the give-way vessel. The vessel to the right (on the other's starboard side) is the stand-on vessel."
+  },
+  {
+    id: 19,
+    topic: "Vessel Hierarchy",
+    question: "Which of the following is an example of a vessel 'Restricted in Ability to Maneuver' (RAM)?",
+    options: ["A. A vessel that is anchored", "B. A vessel engaged in dredging operations", "C. A sailing vessel in light wind", "D. Any vessel over 300 gross tons"],
+    correct: 1,
+    explanation: "RAM vessels include those laying cable, dredging, conducting replenishment at sea, launching or recovering aircraft, minesweeping, and towing vessels that cannot deviate from course."
+  },
+  {
+    id: 20,
+    topic: "Vessel Hierarchy",
+    question: "Rule 16 requires that the give-way vessel:",
+    options: ["A. Stop and wait", "B. Sound the danger signal", "C. Take early and substantial action to keep well clear", "D. Maintain course and speed"],
+    correct: 2,
+    explanation: "Rule 16 requires the give-way vessel to take early and substantial action to keep well clear — not just a small last-minute course change."
+  },
+  {
+    id: 21,
+    topic: "Vessel Hierarchy",
+    question: "Under Rule 17, the stand-on vessel when collision appears inevitable because the give-way vessel has not acted:",
+    options: ["A. Must maintain course and speed at all times", "B. Must sound the danger signal only", "C. Must take action to avoid collision", "D. Must immediately stop engines"],
+    correct: 2,
+    explanation: "Under Rule 17, once it becomes apparent that the give-way vessel is not taking appropriate action, the stand-on vessel MUST take action to avoid collision."
+  },
+
+  // ── CROSSING & MEETING (6) ──
+  {
+    id: 22,
+    topic: "Crossing & Meeting",
+    question: "In a head-on situation, what must both vessels do?",
+    options: ["A. Each turn to port", "B. Each turn to starboard", "C. The larger vessel gives way", "D. The slower vessel gives way"],
+    correct: 1,
+    explanation: "Rule 14: When vessels meet head-on (or nearly so), each must alter course to starboard so they pass port-to-port."
+  },
+  {
+    id: 23,
+    topic: "Crossing & Meeting",
+    question: "In a crossing situation, the give-way vessel should specifically avoid:",
+    options: ["A. Slowing down", "B. Sounding her whistle", "C. Crossing ahead of the stand-on vessel", "D. Altering course to starboard"],
+    correct: 2,
+    explanation: "Rule 15: The give-way vessel in a crossing situation shall avoid crossing ahead of the other vessel. She should alter course to pass astern of the stand-on vessel."
+  },
+  {
+    id: 24,
+    topic: "Crossing & Meeting",
+    question: "A vessel is considered to be overtaking when she is approaching from more than how many degrees abaft the other vessel's beam?",
+    options: ["A. 45 degrees abaft the beam", "B. 22.5 degrees abaft the beam", "C. 90 degrees abaft the beam", "D. 135 degrees abaft the beam"],
+    correct: 1,
+    explanation: "A vessel is overtaking if she is coming up from more than 22.5 degrees abaft the beam of the vessel ahead. Once overtaking, always overtaking until past and clear."
+  },
+  {
+    id: 25,
+    topic: "Crossing & Meeting",
+    question: "Under Inland Rules in a narrow channel, meeting port-to-port instead of the standard starboard-to-starboard pass:",
+    options: ["A. Is always permitted if both vessels agree it is safe", "B. Is never permitted under any circumstance", "C. Is permitted only after signal exchange and mutual agreement", "D. Is only allowed at night with proper lighting"],
+    correct: 2,
+    explanation: "In inland waters, a non-standard passing arrangement requires signal exchange (intent signal + agreement signal) before it is permitted."
+  },
+  {
+    id: 26,
+    topic: "Crossing & Meeting",
+    question: "You see only the green sidelight of another vessel at night. This means:",
+    options: ["A. The vessel is crossing from your port side", "B. The vessel is approaching head-on", "C. The vessel is crossing from your starboard — you are the give-way vessel", "D. The vessel is overtaking you"],
+    correct: 2,
+    explanation: "Seeing only the green (starboard) light means the other vessel's starboard side faces you, placing you on their starboard side — making you the give-way vessel in a crossing situation."
+  },
+  {
+    id: 27,
+    topic: "Crossing & Meeting",
+    question: "You see both red and green sidelights plus a masthead light of an approaching vessel. This indicates:",
+    options: ["A. You are being overtaken", "B. A crossing situation exists", "C. A head-on or near head-on situation", "D. The other vessel is at anchor"],
+    correct: 2,
+    explanation: "Seeing both sidelights plus the masthead light means the vessel is approaching approximately head-on. Both vessels must alter course to starboard."
+  },
+
+  // ── RESTRICTED VISIBILITY (4) ──
+  {
+    id: 28,
+    topic: "Restricted Visibility",
+    question: "In or near an area of restricted visibility, all vessels must proceed at:",
+    options: ["A. Full speed to clear the area quickly", "B. A safe speed adapted to the prevailing circumstances and conditions", "C. No more than 5 knots at all times", "D. The same speed as surrounding vessel traffic"],
+    correct: 1,
+    explanation: "Rule 19: All vessels in or near restricted visibility must proceed at a safe speed with engines ready for immediate maneuver."
+  },
+  {
+    id: 29,
+    topic: "Restricted Visibility",
+    question: "A vessel hears a fog signal apparently forward of the beam in restricted visibility. Rule 19 requires her to:",
+    options: ["A. Sound five short blasts", "B. Increase speed to quickly clear the area", "C. Maintain course and speed", "D. Reduce speed to the minimum at which she can be kept on course, and navigate with extreme caution"],
     correct: 3,
-    explanation: "Power-driven vessels must give way to fishing vessels with restricting gear out. However, NUC, RAM, and vessels constrained by draft rank ABOVE fishing vessels and do NOT need to give way to them."
-  },
-
-  // ── CROSSING / MEETING / OVERTAKING ──
-  {
-    id: "cm01", topic: "Crossing & Meeting", badge: "badge-situations",
-    question: "In a crossing situation between two power-driven vessels, which vessel must give way?",
-    options: [
-      "The vessel that has the other vessel on her PORT side",
-      "The vessel that has the other vessel on her STARBOARD side",
-      "The slower vessel",
-      "The smaller vessel"
-    ],
-    correct: 0,
-    explanation: "The vessel that has the other vessel on her STARBOARD (right) side is the stand-on vessel. The vessel that sees the other on her PORT (left) side must give way. Memory aid: 'give way when they're on your right.'"
+    explanation: "Rule 19(e): On hearing a fog signal forward of the beam, reduce to minimum steerage speed and navigate with extreme caution until risk of collision has passed."
   },
   {
-    id: "cm02", topic: "Crossing & Meeting", badge: "badge-situations",
-    question: "In a head-on (meeting) situation between two power-driven vessels, what should each vessel do?",
-    options: [
-      "The starboard vessel stands on; port vessel gives way",
-      "Both vessels alter course to STARBOARD to pass port-side to port-side",
-      "Both vessels stop until the situation is resolved",
-      "The smaller vessel must give way"
-    ],
-    correct: 1,
-    explanation: "In a head-on meeting, BOTH vessels alter to starboard and pass each other port-to-port (left side to left side), just like driving on a road. Neither has automatic right of way — both must act."
-  },
-  {
-    id: "cm03", topic: "Crossing & Meeting", badge: "badge-situations",
-    question: "An overtaking vessel is defined as approaching from what direction?",
-    options: [
-      "From within 45 degrees of the other vessel's bow",
-      "From more than 22.5 degrees abaft the beam of the vessel ahead",
-      "From exactly 90 degrees (from the beam)",
-      "From any direction at night when sidelights are not visible"
-    ],
-    correct: 1,
-    explanation: "Overtaking means approaching from MORE THAN 22.5 DEGREES ABAFT THE BEAM — the sector where you'd see the sternlight but no sidelights. Once overtaking, you must keep clear even if you later seem to be crossing."
-  },
-  {
-    id: "cm04", topic: "Crossing & Meeting", badge: "badge-situations",
-    question: "Once a vessel is the overtaking vessel, what happens to that obligation if the angle changes?",
-    options: [
-      "The obligation shifts to the other vessel",
-      "The overtaking obligation continues until the vessel is finally past and clear",
-      "The obligation ends when the beam is passed",
-      "The give-way obligation disappears in daylight"
-    ],
-    correct: 1,
-    explanation: "Once classified as overtaking, a vessel remains the give-way vessel UNTIL it is finally past and clear. You can't escape the obligation just because the angle changes — you must stay clear through the entire maneuver."
-  },
-
-  // ── RESTRICTED VISIBILITY ──
-  {
-    id: "rv01", topic: "Restricted Visibility", badge: "badge-fog",
-    question: "In or near restricted visibility, what is the primary requirement under Rule 19?",
-    options: [
-      "Proceed at full speed to clear the area quickly",
-      "Proceed at a SAFE SPEED adapted to conditions",
-      "Immediately anchor and wait",
-      "Sound five short blasts continuously"
-    ],
-    correct: 1,
-    explanation: "Rule 19 requires SAFE SPEED adapted to the prevailing circumstances and restricted visibility. You must be able to stop within the distance of visibility. This is the foundational requirement before anything else."
-  },
-  {
-    id: "rv02", topic: "Restricted Visibility", badge: "badge-fog",
-    question: "You hear a fog signal apparently FORWARD OF YOUR BEAM. What must you do under Rule 19?",
-    options: [
-      "Speed up to clear the area",
-      "Maintain course and speed — you are the stand-on vessel",
-      "Reduce to minimum steerage speed, or stop, until danger of collision is past",
-      "Alter course to starboard only"
-    ],
+    id: 30,
+    topic: "Restricted Visibility",
+    question: "In restricted visibility, a sailing vessel underway (but stopped) sounds:",
+    options: ["A. One prolonged blast every 2 minutes", "B. Two prolonged blasts every 2 minutes", "C. One prolonged and two short blasts at intervals not more than 2 minutes", "D. Three short blasts every minute"],
     correct: 2,
-    explanation: "Rule 19(d): Upon detecting a vessel forward of the beam in restricted visibility (by sound or radar), reduce to MINIMUM STEERAGE SPEED or STOP until the danger of collision is past. Do NOT speed up or hold course blindly."
+    explanation: "A sailing vessel underway in restricted visibility sounds one prolonged + two short blasts (— • •) at intervals of not more than 2 minutes."
   },
   {
-    id: "rv03", topic: "Restricted Visibility", badge: "badge-fog",
-    question: "In restricted visibility, the stand-on/give-way rules from Rule 15–17 (crossing situations):",
-    options: [
-      "Still apply normally",
-      "Do NOT apply — all vessels operate under Rule 19 instead",
-      "Only apply to vessels over 20 meters",
-      "Apply only during daylight hours"
-    ],
-    correct: 1,
-    explanation: "Rule 19 applies when vessels are NOT IN SIGHT of each other (restricted visibility). The crossing/meeting/overtaking rules (Rules 11–18) only apply when vessels ARE in sight. In fog, Rule 19 governs everyone."
-  },
-
-  // ── DEFINITIONS ──
-  {
-    id: "df01", topic: "Definitions", badge: "badge-definitions",
-    question: "A 'vessel not under command' (NUC) means:",
-    options: [
-      "A vessel with no crew aboard",
-      "A vessel unable to maneuver as required due to EXCEPTIONAL CIRCUMSTANCES, unable to keep out of the way",
-      "Any vessel anchored or aground",
-      "A vessel whose captain has abandoned the helm"
-    ],
-    correct: 1,
-    explanation: "NUC = unable to maneuver as required due to EXCEPTIONAL CIRCUMSTANCES (engine failure, steering casualty, etc.). It's not permanent — it's a specific situation preventing normal maneuverability."
-  },
-  {
-    id: "df02", topic: "Definitions", badge: "badge-definitions",
-    question: "By definition, a 'power-driven vessel' is:",
-    options: [
-      "Any vessel with an engine installed",
-      "Any vessel PROPELLED by machinery",
-      "Only commercial vessels using fuel",
-      "Only vessels over 12 meters with an engine"
-    ],
-    correct: 1,
-    explanation: "A power-driven vessel is any vessel PROPELLED BY MACHINERY. A sailboat using its engine — even with sails raised — is a power-driven vessel and must follow power vessel rules and display appropriate lights."
-  },
-  {
-    id: "df03", topic: "Definitions", badge: "badge-definitions",
-    question: "A 'vessel constrained by draft' (CBD) is:",
-    options: [
-      "Any large vessel in shallow water",
-      "A vessel severely restricted in ability to deviate from its course due to draft relative to the available depth and width of navigable water",
-      "A vessel with anchor deployed",
-      "Any vessel towing another vessel"
-    ],
-    correct: 1,
-    explanation: "CBD applies ONLY under COLREGS (international), not Inland Rules. The vessel CANNOT deviate from its course because its deep draft leaves no room in the available channel. It shows a black cylinder (day) or three all-round red lights (night)."
-  },
-  {
-    id: "df04", topic: "Definitions", badge: "badge-definitions",
-    question: "A WIG (Wing-In-Ground) craft is:",
-    options: [
-      "A helicopter or rotorcraft",
-      "A sailing vessel using a spinnaker",
-      "A craft designed to operate in ground effect — flying just above the water surface using aerodynamic lift",
-      "A rigid inflatable boat (RIB) with a rigid keel"
-    ],
+    id: 31,
+    topic: "Restricted Visibility",
+    question: "A vessel at anchor in restricted visibility sounds:",
+    options: ["A. One prolonged blast every minute", "B. Three short blasts every 2 minutes", "C. A bell rung rapidly for about 5 seconds at intervals of not more than 1 minute", "D. Two short blasts every 2 minutes"],
     correct: 2,
-    explanation: "A WIG craft operates in 'ground effect,' generating lift from the air cushion between the hull and the water surface. When on the water they follow power-driven vessel rules; when airborne they follow aviation rules."
-  },
-  {
-    id: "df05", topic: "Definitions", badge: "badge-definitions",
-    question: "A vessel is 'underway' when it is:",
-    options: [
-      "Moving through the water under engine or sail",
-      "Not at anchor, not made fast to shore, and not aground",
-      "Traveling at more than 3 knots",
-      "Under the command of a licensed officer"
-    ],
-    correct: 1,
-    explanation: "'Underway' simply means the vessel is NOT at anchor, NOT made fast to shore, and NOT aground. A vessel can be underway but not making way (e.g., drifting with no engine). Both conditions matter for light/signal rules."
+    explanation: "Anchored vessels ring the bell rapidly for about 5 seconds every minute. Vessels over 100m also sound a gong in the stern portion immediately after the bell."
   },
 
-  // ── LOOKOUT ──
+  // ── DEFINITIONS (6) ──
   {
-    id: "lo01", topic: "Lookout (Rule 5)", badge: "badge-lookout",
+    id: 32,
+    topic: "Definitions",
+    question: "The COLREGS definition of 'vessel' includes:",
+    options: ["A. Only motor-powered watercraft", "B. Ships over 20 meters in length only", "C. Every description of watercraft, including non-displacement craft, WIG craft, and seaplanes", "D. Commercial vessels only"],
+    correct: 2,
+    explanation: "The definition of 'vessel' includes every description of watercraft used or capable of being used on water, including non-displacement craft, WIG craft, and seaplanes."
+  },
+  {
+    id: 33,
+    topic: "Definitions",
+    question: "Under COLREGS, a 'sailing vessel' is defined as:",
+    options: ["A. Any vessel fitted with sails, regardless of whether a motor is running", "B. Any vessel under sail, provided propelling machinery (if fitted) is NOT being used", "C. A vessel over 12 meters using only her sails", "D. A vessel with no engine installed"],
+    correct: 1,
+    explanation: "A sailing vessel is propelled by sail only. If the engine is in use (even with sails set), it is classified as a power-driven vessel and must display a cone shape."
+  },
+  {
+    id: 34,
+    topic: "Definitions",
+    question: "'Vessel Not Under Command' (NUC) is defined as:",
+    options: ["A. A vessel without a properly licensed captain", "B. A vessel that has lost its anchor", "C. A vessel which through some exceptional circumstance is unable to maneuver as required by the rules", "D. A vessel transmitting a MAYDAY distress call"],
+    correct: 2,
+    explanation: "NUC means a vessel that through some exceptional circumstance (e.g., engine failure, steering failure) is unable to maneuver as required and therefore cannot keep out of the way of other vessels."
+  },
+  {
+    id: 35,
+    topic: "Definitions",
+    question: "'Vessel Restricted in Ability to Maneuver' (RAM) is defined as:",
+    options: ["A. A vessel navigating in very shallow water", "B. A vessel whose ability to maneuver as required by the rules is restricted by the nature of her work", "C. Any vessel over 500 gross tons", "D. A vessel with temporary engine trouble"],
+    correct: 1,
+    explanation: "RAM includes vessels engaged in: laying/servicing cable, dredging, underwater operations, replenishment at sea, launching/recovering aircraft, minesweeping, and towing when unable to deviate."
+  },
+  {
+    id: 36,
+    topic: "Definitions",
+    question: "A 'vessel constrained by her draft' is:",
+    options: ["A. Any vessel navigating in water shallower than her draft", "B. A sailing vessel unable to tack due to wind conditions", "C. A power-driven vessel which, because of her draft in relation to available depth of water, is severely restricted in her ability to deviate from the course she is following", "D. A vessel loaded with hazardous cargo"],
+    correct: 2,
+    explanation: "Constrained by draft applies only to power-driven vessels limited by their draft relative to available water depth. Sailing vessels do NOT use this classification."
+  },
+  {
+    id: 37,
+    topic: "Definitions",
+    question: "What is a 'WIG craft' under COLREGS?",
+    options: ["A. A wide-beam inland waterway vessel", "B. A multimodal craft that operates in close proximity to the surface by using ground effect", "C. A weather-influenced guidance ship", "D. A water-intake/grounding vessel"],
+    correct: 1,
+    explanation: "WIG (Wing-In-Ground) craft are aircraft-like craft that fly just above the water surface using ground effect to generate lift. They are classified as vessels under the rules."
+  },
+
+  // ── LOOKOUT & SAFE SPEED (3) ──
+  {
+    id: 38,
+    topic: "Lookout & Safe Speed",
     question: "Rule 5 (Lookout) requires:",
-    options: [
-      "A licensed lookout stationed on the bow at all times",
-      "Every vessel to maintain a proper lookout by sight AND hearing using ALL available means",
-      "Radar watchkeeping only in restricted visibility",
-      "Two-person bridge watch only on commercial vessels"
-    ],
-    correct: 1,
-    explanation: "Rule 5 applies to EVERY vessel and requires a proper lookout at ALL TIMES using sight, hearing, AND all available means appropriate to circumstances — including radar when available. No vessel is exempt."
-  },
-  {
-    id: "lo02", topic: "Lookout (Rule 5)", badge: "badge-lookout",
-    question: "Why must a lookout use ALL AVAILABLE MEANS, including radar?",
-    options: [
-      "Radar is only required in restricted visibility",
-      "Because no single method is always sufficient — different conditions require different tools",
-      "Only vessels over 300 gross tons need radar watches",
-      "Radar use is optional under the rules"
-    ],
-    correct: 1,
-    explanation: "The rules require using all available means because conditions change: radar catches targets in fog, hearing catches sound signals, sight catches visual signals. Using only one sense creates blind spots that can lead to collision."
-  },
-
-  // ── SAFE SPEED ──
-  {
-    id: "sp01", topic: "Safe Speed (Rule 6)", badge: "badge-safespeed",
-    question: "Which factors does Rule 6 (Safe Speed) require you to consider?",
-    options: [
-      "Visibility, traffic density, maneuverability, sea/wind/current conditions, and (for radar-equipped vessels) radar characteristics",
-      "Only the vessel's speed in knots relative to the speed limit",
-      "Only whether it is day or night",
-      "Only the presence of other vessels in the immediate vicinity"
-    ],
-    correct: 0,
-    explanation: "Safe speed (Rule 6) considers: visibility, traffic density, vessel maneuverability (including stopping distance and turning ability), background lights, wind/sea/current, draft vs. available depth, and for radar-equipped vessels: radar limitations, sea state effects on radar, and number/location of detected vessels."
-  },
-  {
-    id: "sp02", topic: "Safe Speed (Rule 6)", badge: "badge-safespeed",
-    question: "In restricted visibility, safe speed means you must be able to:",
-    options: [
-      "Maintain at least 5 knots to maintain steerage",
-      "Stop the vessel within the distance of visibility",
-      "Match the speed of nearby traffic",
-      "Travel at half your normal cruising speed"
-    ],
-    correct: 1,
-    explanation: "The fundamental test of safe speed in restricted visibility is whether you can STOP within the distance you can see. If you can't stop in time when you spot a hazard, you're going too fast. There's no specific speed limit — it depends on conditions."
-  },
-
-  // ── RISK OF COLLISION ──
-  {
-    id: "rc01", topic: "Risk of Collision (Rule 7)", badge: "badge-collision",
-    question: "Under Rule 7, risk of collision is deemed to exist if:",
-    options: [
-      "Another vessel is within 1 nautical mile",
-      "The compass bearing to an approaching vessel does NOT appreciably change",
-      "The other vessel is larger than yours",
-      "You are navigating in a narrow channel"
-    ],
-    correct: 1,
-    explanation: "A CONSTANT (or non-appreciably changing) COMPASS BEARING to an approaching vessel means you are on a collision course. Radar range decreasing + constant bearing = definite collision risk. When in doubt, assume collision risk exists."
-  },
-  {
-    id: "rc02", topic: "Risk of Collision (Rule 7)", badge: "badge-collision",
-    question: "When determining risk of collision using radar, you should:",
-    options: [
-      "Only watch the range — if it's decreasing, there is risk",
-      "Plot the target's course and speed using systematic radar observation",
-      "Assume any radar contact within 5 miles is a collision risk",
-      "Ignore radar contacts that appear to be smaller vessels"
-    ],
-    correct: 1,
-    explanation: "Rule 7 requires SYSTEMATIC RADAR OBSERVATION including plotting. Just watching range decrease isn't enough — you must track bearing AND range to determine CPA (Closest Point of Approach) and assess true collision risk."
-  },
-
-  // ── ACTION TO AVOID COLLISION ──
-  {
-    id: "ac01", topic: "Action to Avoid Collision (Rule 8)", badge: "badge-action",
-    question: "Rule 8 requires that action taken to avoid collision must be:",
-    options: [
-      "Small and gradual to avoid startling other vessels",
-      "Large enough to be readily apparent to the other vessel, taken in ample time",
-      "Made only by the stand-on vessel",
-      "Taken at the last possible moment to maintain efficiency"
-    ],
-    correct: 1,
-    explanation: "Rule 8 requires action be taken in AMPLE TIME and be LARGE ENOUGH to be readily apparent to the other vessel. Small, gradual alterations may go unnoticed and fail to resolve the situation. Early, decisive, obvious action is required."
-  },
-  {
-    id: "ac02", topic: "Action to Avoid Collision (Rule 8)", badge: "badge-action",
-    question: "When altering course to avoid collision, the alteration should be:",
-    options: [
-      "Small and incremental so the other vessel can react gradually",
-      "Large enough to be easily visible on the other vessel's radar",
-      "Made only to port (left)",
-      "Made only by slowing down, not by changing course"
-    ],
-    correct: 1,
-    explanation: "Course alterations must be LARGE AND OBVIOUS — a small 5-degree change may be invisible to another vessel on radar or visually. A clear, large alteration tells the other vessel exactly what you're doing, which is far safer."
-  },
-
-  // ── NARROW CHANNELS ──
-  {
-    id: "nc01", topic: "Narrow Channels (Rule 9)", badge: "badge-narrow",
-    question: "Rule 9 (Narrow Channels) requires vessels to keep:",
-    options: [
-      "To the PORT side of the channel",
-      "To the STARBOARD side of the channel as far as safe and practicable",
-      "In the center of the channel at all times",
-      "At the stern of any vessel ahead of them"
-    ],
-    correct: 1,
-    explanation: "Rule 9 requires keeping to the STARBOARD (right) side of the channel or fairway, just like driving on a road. This creates two-lane traffic flow and reduces head-on encounter risk."
-  },
-  {
-    id: "nc02", topic: "Narrow Channels (Rule 9)", badge: "badge-narrow",
-    question: "In a narrow channel, a vessel less than 20 meters or a sailing vessel SHALL NOT:",
-    options: [
-      "Travel faster than 5 knots",
-      "Impede the passage of vessels that can safely navigate ONLY within the narrow channel",
-      "Anchor without permission",
-      "Cross the channel without signaling"
-    ],
-    correct: 1,
-    explanation: "Rule 9: Small vessels (under 20m) and sailing vessels must NOT impede large vessels that can ONLY safely navigate within the narrow channel (e.g., deep-draft ships). Step aside — the big vessel has no choice but to use that lane."
-  },
-  {
-    id: "nc03", topic: "Narrow Channels (Rule 9)", badge: "badge-narrow",
-    question: "Crossing traffic in a narrow channel (Rule 9):",
-    options: [
-      "Always has right of way over channel traffic",
-      "Shall not impede vessels following the channel",
-      "Should sound five short blasts before crossing",
-      "Must wait for the channel to be completely clear"
-    ],
-    correct: 1,
-    explanation: "Vessels crossing a narrow channel shall not impede vessels navigating along the channel. The channel-following vessel has priority. If you must cross, do so as quickly and safely as possible, staying out of the way."
-  },
-
-  // ── TRAFFIC SEPARATION SCHEMES ──
-  {
-    id: "ts01", topic: "Traffic Separation (Rule 10)", badge: "badge-tss",
-    question: "When CROSSING a Traffic Separation Scheme (TSS), a vessel should:",
-    options: [
-      "Cross parallel to the traffic lanes",
-      "Proceed in the direction of the nearest traffic lane flow",
-      "Cross as nearly as possible at RIGHT ANGLES to the general direction of traffic flow",
-      "Avoid crossing the TSS entirely — go around it"
-    ],
+    options: ["A. A dedicated lookout only during restricted visibility", "B. A lookout only between sunset and sunrise", "C. Every vessel shall at all times maintain a proper lookout by sight and hearing and by all available means", "D. A lookout only when in or near a traffic separation scheme"],
     correct: 2,
-    explanation: "Rule 10: Cross a TSS at RIGHT ANGLES (90 degrees) to the traffic lanes as far as practicable. This minimizes the time spent in the lanes and makes your intentions clear to lane traffic."
+    explanation: "Rule 5 is absolute — every vessel, at ALL times, must maintain a proper lookout using sight, hearing, and all available means (radar, AIS, etc.) to make a full appraisal of the situation."
   },
   {
-    id: "ts02", topic: "Traffic Separation (Rule 10)", badge: "badge-tss",
-    question: "Vessels less than 20m and sailing vessels using a TSS shall:",
-    options: [
-      "Use the separation zone in the middle of the TSS",
-      "Not impede the safe passage of power-driven vessels following the traffic lanes",
-      "Have priority over vessels in the traffic lanes due to their small size",
-      "Not be permitted in a TSS under any circumstances"
-    ],
+    id: 39,
+    topic: "Lookout & Safe Speed",
+    question: "Factors to be taken into account in determining safe speed (Rule 6) include:",
+    options: ["A. The vessel's name and registration number", "B. State of visibility, traffic density, stopping distance, and background lights at night", "C. Crew size and experience only", "D. Time of year and season only"],
     correct: 1,
-    explanation: "Rule 10: Small vessels (under 20m) and sailing vessels may use a TSS but shall NOT IMPEDE safe passage of power-driven vessels in the lanes. You can be there — just don't get in the way of the big ships."
+    explanation: "Rule 6 safe speed factors include: visibility, traffic density, maneuverability, background light at night, proximity of hazards, draft vs. available depth, and radar capability."
+  },
+  {
+    id: 40,
+    topic: "Lookout & Safe Speed",
+    question: "Which of the following is NOT a factor in determining safe speed under Rule 6?",
+    options: ["A. State of visibility", "B. Traffic density", "C. The color of your vessel's navigation lights", "D. Vessel's stopping distance and turning ability"],
+    correct: 2,
+    explanation: "Rule 6 factors include visibility, traffic density, maneuverability, draft, sea state, and radar use. The color of navigation lights is not a safe speed factor."
   },
 
-  // ── ANCHORING SIGNALS ──
+  // ── RISK OF COLLISION (3) ──
   {
-    id: "an01", topic: "Anchoring Signals", badge: "badge-anchor",
-    question: "An anchored vessel in restricted visibility sounds:",
-    options: [
-      "One prolonged blast every 2 minutes",
-      "Rapid ringing of a bell for about 5 seconds at intervals of not more than one minute",
-      "Three short blasts every 2 minutes",
-      "Two prolonged blasts every minute"
-    ],
+    id: 41,
+    topic: "Risk of Collision",
+    question: "Under Rule 7, risk of collision shall be deemed to exist if:",
+    options: ["A. Another vessel is within 1 nautical mile", "B. The compass bearing of an approaching vessel does not appreciably change", "C. The other vessel is larger than your own vessel", "D. You are operating in an area of restricted visibility"],
     correct: 1,
-    explanation: "An anchored vessel rings a bell RAPIDLY for ~5 seconds every minute. Vessels 100m or more in length also sound a gong at the stern immediately after the bell signal forward."
+    explanation: "Rule 7: If the compass bearing to an approaching vessel remains constant (or nearly so), a collision risk exists and evasive action must be taken."
   },
   {
-    id: "an02", topic: "Anchoring Signals", badge: "badge-anchor",
-    question: "A vessel AGROUND in restricted visibility sounds:",
-    options: [
-      "THREE separate and distinct strokes on the bell BEFORE AND AFTER the rapid bell ringing signal",
-      "Continuous blasts on the horn",
-      "Five short blasts every 2 minutes",
-      "One prolonged blast every minute, same as a moving vessel"
-    ],
-    correct: 0,
-    explanation: "A vessel aground sounds the anchor bell signal (rapid ringing for 5 seconds per minute) but preceded AND followed by THREE DISTINCT STROKES on the bell. This warns others of a fixed hazard they cannot see."
+    id: 42,
+    topic: "Risk of Collision",
+    question: "Under Rule 7, if a vessel has operational radar equipment, it must be used:",
+    options: ["A. Only in restricted visibility", "B. Only during night-time hours", "C. Only in port approaches and traffic separation schemes", "D. Properly and systematically, including long-range scanning, to obtain early warning of collision risk"],
+    correct: 3,
+    explanation: "Rule 7 requires that if radar is fitted and operational, it shall be used properly and systematically — including long-range scanning — to detect risks of collision early."
+  },
+  {
+    id: 43,
+    topic: "Risk of Collision",
+    question: "Under Rule 7, if information obtained from radar is 'scanty':",
+    options: ["A. It confirms no risk of collision exists", "B. Risk of collision shall still be deemed to exist", "C. You should increase speed to clarify the situation", "D. This consideration only applies to vessels under 20 meters"],
+    correct: 1,
+    explanation: "Rule 7(c): If there is any doubt, risk of collision shall be deemed to exist. Scanty radar information is insufficient to conclude that safety is assured."
   },
 
-  // ── DAY SHAPES ──
+  // ── ACTION TO AVOID COLLISION (3) ──
   {
-    id: "ds01", topic: "Day Shapes", badge: "badge-dayshapes",
-    question: "What day shape does an ANCHORED vessel display?",
-    options: ["A cone (point down)", "A cylinder", "A black ball", "A black diamond"],
+    id: 44,
+    topic: "Action to Avoid Collision",
+    question: "Under Rule 8, action taken to avoid collision shall be:",
+    options: ["A. Taken only when directed by vessel traffic service (VTS)", "B. A series of small, gradual adjustments", "C. Positive, made in ample time, and large enough to be readily apparent to the other vessel", "D. Always a course alteration, never a speed reduction"],
     correct: 2,
-    explanation: "An anchored vessel displays a BLACK BALL in the forward part of the vessel. Simple rule: ball = anchored. Recognize it and give the vessel space — it can't move out of your way."
+    explanation: "Rule 8: Action must be positive, made in ample time, and large enough to be clearly apparent to the other vessel. Small, hesitant actions can be more dangerous than no action at all."
   },
   {
-    id: "ds02", topic: "Day Shapes", badge: "badge-dayshapes",
-    question: "A sailing vessel also using its engine must display which day shape?",
-    options: ["A black ball", "A cone with point DOWNWARD, forward", "A cylinder", "Two black balls"],
+    id: 45,
+    topic: "Action to Avoid Collision",
+    question: "Rule 8 states that when taking action to avoid collision:",
+    options: ["A. Always increase speed to pass quickly", "B. A succession of small alterations of course or speed should be avoided", "C. Always alter course to port", "D. Contact the other vessel by VHF radio before maneuvering"],
     correct: 1,
-    explanation: "A sailing vessel under engine AND sail shows a CONE POINT DOWN forward. This signals 'I am a power-driven vessel even though I have sails' — meaning it must follow all power vessel rules and give way accordingly."
+    explanation: "Rule 8: If circumstances permit, a succession of small alterations of course or speed should be avoided. One large, unambiguous maneuver is safer than several small ones."
   },
   {
-    id: "ds03", topic: "Day Shapes", badge: "badge-dayshapes",
-    question: "A NUC vessel displays what day shapes?",
-    options: [
-      "Two black balls in a vertical line",
-      "A black diamond",
-      "A cone and a ball",
-      "Three black balls in a vertical line"
-    ],
-    correct: 0,
-    explanation: "NUC = TWO BLACK BALLS in a vertical line (day) and two all-round red lights in a vertical line (night). Two shapes/lights, just like the letter 'NUC' has two main concepts: unable to maneuver."
-  },
-  {
-    id: "ds04", topic: "Day Shapes", badge: "badge-dayshapes",
-    question: "What day shape does a vessel constrained by draft display (COLREGS only)?",
-    options: ["Black ball", "Black cone", "Black CYLINDER", "Black diamond"],
+    id: 46,
+    topic: "Action to Avoid Collision",
+    question: "Stopping, slowing, or going astern to create more time to assess a dangerous situation:",
+    options: ["A. Is never appropriate under the rules", "B. Is only permitted for vessels over 100 meters in length", "C. Is a valid collision avoidance action under Rule 8", "D. Requires prior radio contact with the other vessel"],
     correct: 2,
-    explanation: "A vessel constrained by draft shows a BLACK CYLINDER (day) and three all-round red lights in a vertical line (night). Remember: CBD = Cylinder. This shape is ONLY under COLREGS, not Inland Rules."
+    explanation: "Reducing speed, stopping engines, or going astern are all valid collision avoidance actions under Rule 8. The goal is to ensure safe passing of the vessels."
+  },
+
+  // ── NARROW CHANNELS (3) ──
+  {
+    id: 47,
+    topic: "Narrow Channels",
+    question: "Rule 9 requires that vessels in a narrow channel or fairway:",
+    options: ["A. Keep to the port side", "B. Keep to the center of the channel", "C. Keep as far to the starboard side of the channel as is safe and practicable", "D. Must not enter without VTS clearance"],
+    correct: 2,
+    explanation: "Rule 9: All vessels must keep to the starboard side of narrow channels — like a road, stay to the right."
   },
   {
-    id: "ds05", topic: "Day Shapes", badge: "badge-dayshapes",
-    question: "What day shape does a vessel engaged in DREDGING or underwater operations display on the side where an obstruction exists?",
-    options: ["Two black balls", "A black diamond", "Two cones in a vertical line", "A red cylinder"],
+    id: 48,
+    topic: "Narrow Channels",
+    question: "A vessel less than 20 meters in length or a sailing vessel navigating in a narrow channel:",
+    options: ["A. Has right of way over all other vessels in the channel", "B. May anchor anywhere within the channel", "C. Must broadcast her position on VHF", "D. Shall not impede the passage of a vessel which can only safely navigate within the channel"],
+    correct: 3,
+    explanation: "Small vessels and sailing vessels must not obstruct or impede larger vessels that are confined to the channel and unable to safely navigate outside it."
+  },
+  {
+    id: 49,
+    topic: "Narrow Channels",
+    question: "A vessel intending to cross a narrow channel:",
+    options: ["A. Has priority over vessels traveling along the length of the channel", "B. Shall not impede the passage of vessels navigating within the channel", "C. Must wait until all vessel traffic in the channel has cleared", "D. May cross only during daylight hours"],
     correct: 1,
-    explanation: "A vessel dredging or conducting underwater operations shows two balls (obstruction side) and two diamonds (clear side) by day, or two red lights (obstruction) and two green lights (clear passage) by night."
+    explanation: "Crossing vessels must not impede vessels navigating along the channel. The crossing vessel does not have priority and must give way to through traffic."
+  },
+
+  // ── TRAFFIC SEPARATION (2) ──
+  {
+    id: 50,
+    topic: "Traffic Separation",
+    question: "In a Traffic Separation Scheme (TSS), a vessel shall:",
+    options: ["A. Travel at maximum safe speed to clear the zone quickly", "B. Proceed in the appropriate traffic lane in the general direction of traffic flow for that lane", "C. Navigate in the center of the separation zone", "D. Maintain a continuous VHF watch on channel 16 only"],
+    correct: 1,
+    explanation: "Rule 10: Vessels in a TSS must use the appropriate traffic lane and travel in the established direction of traffic flow for that lane."
+  },
+  {
+    id: 51,
+    topic: "Traffic Separation",
+    question: "A vessel crossing a traffic lane in a TSS should do so:",
+    options: ["A. At a 45-degree angle to the direction of traffic flow", "B. Only at specially designated crossing points", "C. As nearly as practicable at right angles to the general direction of traffic flow", "D. As quickly as possible, at whatever angle is most convenient"],
+    correct: 2,
+    explanation: "Rule 10: Vessels crossing a traffic lane should do so as nearly as practicable at right angles — this minimizes time spent in the lane and makes intentions clear to other vessels."
+  },
+
+  // ── ANCHORING & DAY SHAPES (4) ──
+  {
+    id: 52,
+    topic: "Anchoring & Day Shapes",
+    question: "A vessel at anchor, less than 50 meters in length, during daylight hours shall exhibit:",
+    options: ["A. Two black balls in a vertical line", "B. One black ball shape in the fore part of the vessel", "C. A black diamond shape", "D. A black cone with apex downward"],
+    correct: 1,
+    explanation: "An anchored vessel under 50m shows a single black ball shape in the fore part of the vessel during daylight hours."
+  },
+  {
+    id: 53,
+    topic: "Anchoring & Day Shapes",
+    question: "A sailing vessel that is also using her propulsion machinery must exhibit:",
+    options: ["A. A single black ball in the fore part", "B. Two black balls in a vertical line", "C. A conical shape, apex downwards, in the fore part", "D. A black cylinder shape"],
+    correct: 2,
+    explanation: "A sailing vessel under power (even with sails set) is classified as a power-driven vessel and must display a cone, apex downward, in the fore part."
+  },
+  {
+    id: 54,
+    topic: "Anchoring & Day Shapes",
+    question: "A vessel constrained by her draft displays:",
+    options: ["A. Two black balls and two all-round red lights", "B. A cylinder shape (day) and three all-round red lights in a vertical line (night)", "C. A black cone and two all-round red lights", "D. A black diamond and one all-round red light"],
+    correct: 1,
+    explanation: "A vessel constrained by draft displays a cylinder as the daylight shape, and three all-around red lights in a vertical line at night."
+  },
+  {
+    id: 55,
+    topic: "Anchoring & Day Shapes",
+    question: "A vessel Not Under Command (NUC) shall exhibit, during daylight hours:",
+    options: ["A. One black ball", "B. A black diamond", "C. A black cone, apex downward", "D. Two black balls in a vertical line"],
+    correct: 3,
+    explanation: "An NUC vessel shows two black balls (or shapes) in a vertical line during daylight hours, in addition to lights at night."
   }
 ];
 
-// ══════════════════════════════════════════════════════════════════
-//  TOPICS CONFIGURATION
-// ══════════════════════════════════════════════════════════════════
-const TOPICS = [
-  { key: "all",                    label: "🌊 Mixed (All Topics)",         icon: "🌊" },
-  { key: "Navigation Lights",      label: "💡 Navigation Lights",           icon: "💡" },
-  { key: "Sound Signals",          label: "📯 Sound Signals",               icon: "📯" },
-  { key: "Vessel Hierarchy",       label: "⚖️ Vessel Hierarchy",            icon: "⚖️" },
-  { key: "Crossing & Meeting",     label: "🚢 Crossing & Meeting",          icon: "🚢" },
-  { key: "Restricted Visibility",  label: "🌫️ Restricted Visibility",       icon: "🌫️" },
-  { key: "Definitions",            label: "📖 Definitions",                 icon: "📖" },
-  { key: "Lookout (Rule 5)",       label: "👁️ Lookout — Rule 5",            icon: "👁️" },
-  { key: "Safe Speed (Rule 6)",    label: "⚡ Safe Speed — Rule 6",         icon: "⚡" },
-  { key: "Risk of Collision (Rule 7)", label: "⚠️ Risk of Collision — Rule 7", icon: "⚠️" },
-  { key: "Action to Avoid Collision (Rule 8)", label: "🔄 Action to Avoid — Rule 8", icon: "🔄" },
-  { key: "Narrow Channels (Rule 9)",   label: "⛵ Narrow Channels — Rule 9",    icon: "⛵" },
-  { key: "Traffic Separation (Rule 10)", label: "🛣️ Traffic Separation — Rule 10", icon: "🛣️" },
-  { key: "Anchoring Signals",      label: "⚓ Anchoring Signals",           icon: "⚓" },
-  { key: "Day Shapes",             label: "🔺 Day Shapes",                  icon: "🔺" },
-];
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  STATE
-// ══════════════════════════════════════════════════════════════════
-let state = {
-  selectedTopic: "all",
-  sessionLength: 10,
-  sessionQuestions: [],
-  currentIndex: 0,
-  currentStreak: 0,
-  sessionBestStreak: 0,
-  answeredCorrectly: [],
-  answeredWrongly: [],
-  answered: false,
-  weakMode: false,
+// ═══════════════════════════════════════════════════
+const STORAGE_KEY = 'colregs_v1';
+
+let gameState = {
+  bestStreak: 0,
+  wrongQuestions: []  // array of question IDs
 };
 
-// ── localStorage helpers ──
-function loadStorage() {
-  return {
-    bestStreak: parseInt(localStorage.getItem("rotr_bestStreak") || "0"),
-    wrongIds: JSON.parse(localStorage.getItem("rotr_wrongIds") || "[]"),
-  };
-}
-function saveBestStreak(n) {
-  const s = loadStorage();
-  if (n > s.bestStreak) {
-    localStorage.setItem("rotr_bestStreak", String(n));
-  }
-}
-function addWrongId(id) {
-  const s = loadStorage();
-  if (!s.wrongIds.includes(id)) {
-    s.wrongIds.push(id);
-    localStorage.setItem("rotr_wrongIds", JSON.stringify(s.wrongIds));
-  }
-}
-function removeWrongId(id) {
-  const s = loadStorage();
-  const filtered = s.wrongIds.filter(x => x !== id);
-  localStorage.setItem("rotr_wrongIds", JSON.stringify(filtered));
+let currentSession = {
+  questions: [],
+  index: 0,
+  score: 0,
+  streak: 0,
+  bestStreakThisSession: 0,
+  wrongThisSession: [],
+  topic: 'all',
+  length: 5
+};
+
+// ═══════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      gameState.bestStreak = saved.bestStreak || 0;
+      gameState.wrongQuestions = Array.isArray(saved.wrongQuestions) ? saved.wrongQuestions : [];
+    }
+  } catch(e) { /* ignore */ }
 }
 
-// ── Fisher-Yates shuffle ──
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+  } catch(e) { /* ignore */ }
+}
+
+// ═══════════════════════════════════════════════════
+//  FISHER-YATES SHUFFLE
+// ═══════════════════════════════════════════════════
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -1242,313 +983,271 @@ function shuffle(arr) {
   return a;
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  HOME SCREEN
-// ══════════════════════════════════════════════════════════════════
-function initHome() {
-  const { bestStreak, wrongIds } = loadStorage();
-  document.getElementById("home-best-streak").textContent = bestStreak;
-
-  // Weak areas banner
-  const weakBanner = document.getElementById("weak-banner");
-  const weakCount = document.getElementById("weak-count");
-  if (wrongIds.length > 0) {
-    weakBanner.style.display = "flex";
-    weakCount.textContent = wrongIds.length;
-  } else {
-    weakBanner.style.display = "none";
-  }
-
-  // Build topic grid
-  const grid = document.getElementById("topic-grid");
-  grid.innerHTML = "";
-  TOPICS.forEach(t => {
-    const btn = document.createElement("button");
-    btn.className = "topic-btn" + (state.selectedTopic === t.key ? " selected" : "");
-    btn.dataset.topic = t.key;
-    btn.innerHTML = `<span class="topic-icon">${t.icon}</span>${t.label.replace(/^[^\s]+ /, "")}`;
-    btn.onclick = () => selectTopic(t.key);
-    grid.appendChild(btn);
-  });
-
-  // Length buttons
-  document.querySelectorAll(".len-btn").forEach(b => {
-    b.classList.toggle("selected", parseInt(b.dataset.len) === state.sessionLength);
-  });
-}
-
-function selectTopic(key) {
-  state.selectedTopic = key;
-  document.querySelectorAll(".topic-btn").forEach(b => {
-    b.classList.toggle("selected", b.dataset.topic === key);
-  });
-}
-
-function selectLength(n) {
-  state.sessionLength = n;
-  document.querySelectorAll(".len-btn").forEach(b => {
-    b.classList.toggle("selected", parseInt(b.dataset.len) === n);
-  });
-}
-
-function startWeakAreas() {
-  const { wrongIds } = loadStorage();
-  if (wrongIds.length === 0) return;
-  state.weakMode = true;
-  state.selectedTopic = "all";
-  beginSession(wrongIds);
-}
-
-function startQuiz(weak) {
-  state.weakMode = false;
-  beginSession(null);
-}
-
-function beginSession(forceIds) {
-  // Pick questions
-  let pool;
-  if (forceIds) {
-    pool = QUESTIONS.filter(q => forceIds.includes(q.id));
-  } else if (state.selectedTopic === "all") {
-    pool = [...QUESTIONS];
-  } else {
-    pool = QUESTIONS.filter(q => q.topic === state.selectedTopic);
-  }
-
-  if (pool.length === 0) {
-    alert("No questions available for this topic yet. Try 'Mixed' mode!");
-    return;
-  }
-
-  const shuffled = shuffle(pool);
-  state.sessionQuestions = shuffled.slice(0, Math.min(state.sessionLength, shuffled.length));
-  state.currentIndex = 0;
-  state.currentStreak = 0;
-  state.sessionBestStreak = 0;
-  state.answeredCorrectly = [];
-  state.answeredWrongly = [];
-  state.answered = false;
-
-  showScreen("screen-quiz");
-  renderQuestion();
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  QUIZ SCREEN
-// ══════════════════════════════════════════════════════════════════
-function renderQuestion() {
-  const q = state.sessionQuestions[state.currentIndex];
-  const total = state.sessionQuestions.length;
-  const idx = state.currentIndex;
-
-  // Header
-  document.getElementById("q-current").textContent = idx + 1;
-  document.getElementById("q-total").textContent = total;
-  document.getElementById("q-streak").textContent = state.currentStreak;
-
-  // Progress bar
-  const pct = (idx / total) * 100;
-  document.getElementById("progress-fill").style.width = pct + "%";
-
-  // Topic badge
-  const badge = document.getElementById("topic-badge");
-  badge.textContent = q.topic;
-  badge.className = "topic-badge " + q.badge;
-
-  // Question
-  document.getElementById("question-text").textContent = q.question;
-
-  // Options
-  const grid = document.getElementById("options-grid");
-  grid.innerHTML = "";
-  const labels = ["A", "B", "C", "D"];
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.innerHTML = `<span class="option-label">${labels[i]}</span><span>${opt}</span>`;
-    btn.onclick = () => handleAnswer(i);
-    grid.appendChild(btn);
-  });
-
-  // Feedback box
-  const fb = document.getElementById("feedback-box");
-  fb.className = "feedback-box";
-  fb.style.display = "none";
-
-  // Next button
-  document.getElementById("next-btn").style.display = "none";
-  state.answered = false;
-}
-
-function handleAnswer(chosenIndex) {
-  if (state.answered) return;
-  state.answered = true;
-
-  const q = state.sessionQuestions[state.currentIndex];
-  const correct = chosenIndex === q.correct;
-  const labels = ["A", "B", "C", "D"];
-  const options = document.querySelectorAll(".option-btn");
-
-  // Disable all options
-  options.forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === q.correct) {
-      btn.classList.add("correct");
-    } else if (i === chosenIndex && !correct) {
-      btn.classList.add("wrong");
-    } else {
-      btn.classList.add("dimmed");
-    }
-  });
-
-  // Update streak
-  if (correct) {
-    state.currentStreak++;
-    if (state.currentStreak > state.sessionBestStreak) {
-      state.sessionBestStreak = state.currentStreak;
-    }
-    state.answeredCorrectly.push(q.id);
-    removeWrongId(q.id);
-  } else {
-    state.currentStreak = 0;
-    state.answeredWrongly.push(q.id);
-    addWrongId(q.id);
-  }
-
-  document.getElementById("q-streak").textContent = state.currentStreak;
-
-  // Show feedback
-  const fb = document.getElementById("feedback-box");
-  const fbTitle = document.getElementById("feedback-title");
-  const fbExp = document.getElementById("feedback-explanation");
-
-  if (correct) {
-    fb.className = "feedback-box correct-fb show";
-    fb.style.display = "block";
-    const praise = ["✅ Correct!", "✅ Exactly right!", "✅ Nicely done!", "✅ That's it!"][Math.floor(Math.random() * 4)];
-    fbTitle.textContent = praise;
-  } else {
-    fb.className = "feedback-box wrong-fb show";
-    fb.style.display = "block";
-    fbTitle.textContent = `❌ The correct answer is: ${labels[q.correct]}. ${q.options[q.correct]}`;
-  }
-  fbExp.textContent = q.explanation;
-
-  // Show next button
-  const nextBtn = document.getElementById("next-btn");
-  const isLast = state.currentIndex === state.sessionQuestions.length - 1;
-  nextBtn.textContent = isLast ? "See Results 🏁" : "Next Question →";
-  nextBtn.style.display = "block";
-}
-
-function nextQuestion() {
-  const isLast = state.currentIndex === state.sessionQuestions.length - 1;
-  if (isLast) {
-    showEndScreen();
-  } else {
-    state.currentIndex++;
-    renderQuestion();
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  END SCREEN
-// ══════════════════════════════════════════════════════════════════
-function showEndScreen() {
-  const total = state.sessionQuestions.length;
-  const correct = state.answeredCorrectly.length;
-  const pct = total > 0 ? correct / total : 0;
-
-  // Save best streak
-  saveBestStreak(state.sessionBestStreak);
-
-  // Update progress bar to 100%
-  document.getElementById("progress-fill").style.width = "100%";
-
-  // Score display
-  document.getElementById("end-correct").textContent = correct;
-  document.getElementById("end-total").textContent = total;
-  document.getElementById("end-streak").textContent = state.sessionBestStreak;
-
-  // Encouragement
-  let emoji, title, message;
-  if (pct >= 0.95) {
-    emoji = "🏆"; title = "Outstanding!";
-    message = "Near-perfect score! You clearly know your Rules of the Road. Keep that streak going!";
-  } else if (pct >= 0.8) {
-    emoji = "🎉"; title = "Great Work!";
-    message = "Strong performance! Review any missed questions and you'll be ready for the exam.";
-  } else if (pct >= 0.65) {
-    emoji = "👍"; title = "Good Progress!";
-    message = "Solid effort! A few more practice runs on your missed topics and you'll have it locked down.";
-  } else if (pct >= 0.5) {
-    emoji = "⛵"; title = "Keep Sailing!";
-    message = "You're building your knowledge! Try the 'Practice Weak Areas' mode to focus on missed questions.";
-  } else {
-    emoji = "⚓"; title = "Anchors Aweigh!";
-    message = "Every expert started somewhere. Try a single topic category to build your confidence one area at a time.";
-  }
-
-  document.getElementById("end-emoji").textContent = emoji;
-  document.getElementById("end-title").textContent = title;
-  document.getElementById("end-message").textContent = message;
-
-  // Missed questions list
-  const missedSection = document.getElementById("missed-section");
-  const missedList = document.getElementById("missed-list");
-  missedList.innerHTML = "";
-
-  if (state.answeredWrongly.length > 0) {
-    missedSection.style.display = "block";
-    state.answeredWrongly.forEach(id => {
-      const q = QUESTIONS.find(x => x.id === id);
-      if (!q) return;
-      const div = document.createElement("div");
-      div.className = "missed-item";
-      div.innerHTML = `
-        <div class="missed-q">${q.question}</div>
-        <div class="missed-a">✅ ${q.options[q.correct]}</div>
-      `;
-      missedList.appendChild(div);
-    });
-  } else {
-    missedSection.style.display = "none";
-  }
-
-  showScreen("screen-end");
-  // Re-trigger pop animation
-  const card = document.getElementById("end-card");
-  card.classList.remove("pop");
-  void card.offsetWidth;
-  card.classList.add("pop");
-}
-
-function retrySession() {
-  // Same topic and length
-  beginSession(state.weakMode ? loadStorage().wrongIds : null);
-  if (!state.weakMode && state.selectedTopic !== "all") {
-    // already set
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════
 function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
 
-function goHome() {
-  showScreen("screen-home");
-  initHome();
+// ═══════════════════════════════════════════════════
+//  HOME SCREEN
+// ═══════════════════════════════════════════════════
+function updateHomeScreen() {
+  document.getElementById('home-best-streak').textContent = gameState.bestStreak;
+  const weakCount = gameState.wrongQuestions.length;
+  const weakBtn = document.getElementById('btn-weak-home');
+  const weakSpan = document.getElementById('weak-count');
+  const wrongInfo = document.getElementById('home-wrong-count');
+  const weakOpt = document.getElementById('opt-weak');
+
+  if (weakCount > 0) {
+    weakBtn.classList.remove('hidden');
+    weakSpan.textContent = weakCount;
+    wrongInfo.textContent = '⚠️ ' + weakCount + ' to review';
+    if (weakOpt) weakOpt.disabled = false;
+  } else {
+    weakBtn.classList.add('hidden');
+    wrongInfo.textContent = '✔️ All clear!';
+    if (weakOpt) weakOpt.disabled = true;
+  }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════════════════════
-initHome();
+// ═══════════════════════════════════════════════════
+//  START QUIZ
+// ═══════════════════════════════════════════════════
+function startQuiz(topicOverride) {
+  const topicSel = topicOverride !== undefined ? topicOverride : document.getElementById('topic-select').value;
+  const lenBtn = document.querySelector('.length-btn.selected');
+  const len = lenBtn ? parseInt(lenBtn.dataset.len, 10) : 5;
+
+  currentSession.topic = topicSel;
+  currentSession.length = len;
+  currentSession.index = 0;
+  currentSession.score = 0;
+  currentSession.streak = 0;
+  currentSession.bestStreakThisSession = 0;
+  currentSession.wrongThisSession = [];
+
+  // Build question pool
+  let pool;
+  if (topicSel === 'all') {
+    pool = ALL_QUESTIONS;
+  } else if (topicSel === 'weak') {
+    const weakSet = new Set(gameState.wrongQuestions);
+    pool = ALL_QUESTIONS.filter(q => weakSet.has(q.id));
+    if (pool.length === 0) pool = ALL_QUESTIONS; // fallback
+  } else {
+    pool = ALL_QUESTIONS.filter(q => q.topic === topicSel);
+    if (pool.length === 0) pool = ALL_QUESTIONS; // fallback
+  }
+
+  pool = shuffle(pool);
+  const actual = Math.min(len, pool.length);
+  currentSession.questions = pool.slice(0, actual);
+  currentSession.length = actual;
+
+  showScreen('screen-quiz');
+  showQuestion();
+}
+
+// ═══════════════════════════════════════════════════
+//  SHOW QUESTION
+// ═══════════════════════════════════════════════════
+function showQuestion() {
+  const q = currentSession.questions[currentSession.index];
+  const total = currentSession.length;
+  const idx = currentSession.index;
+
+  // Update header
+  document.getElementById('quiz-streak').textContent = currentSession.streak;
+  document.getElementById('quiz-counter').textContent = 'Q ' + (idx + 1) + ' of ' + total;
+  document.getElementById('quiz-score').textContent = '✓ ' + currentSession.score;
+
+  // Progress bar (based on completed questions)
+  const pct = (idx / total) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+
+  // Question content
+  document.getElementById('topic-badge').textContent = q.topic;
+  document.getElementById('question-text').textContent = q.question;
+
+  // Build answer buttons
+  const container = document.getElementById('answer-buttons');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach(function(opt, i) {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    // Strip leading "A. " etc. from the option text for cleaner display
+    const text = opt.replace(/^[A-D]\.\s*/, '');
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + text + '</span>';
+    btn.addEventListener('click', function() { handleAnswer(i); });
+    container.appendChild(btn);
+  });
+
+  // Reset feedback area
+  const feedbackBox = document.getElementById('feedback-box');
+  feedbackBox.classList.remove('show');
+  document.getElementById('btn-next').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════
+//  HANDLE ANSWER
+// ═══════════════════════════════════════════════════
+function handleAnswer(chosenIndex) {
+  const q = currentSession.questions[currentSession.index];
+  const isCorrect = chosenIndex === q.correct;
+  const buttons = document.querySelectorAll('.answer-btn');
+
+  // Disable all buttons immediately
+  buttons.forEach(function(b) { b.disabled = true; });
+
+  if (isCorrect) {
+    currentSession.score++;
+    currentSession.streak++;
+    if (currentSession.streak > currentSession.bestStreakThisSession) {
+      currentSession.bestStreakThisSession = currentSession.streak;
+    }
+    if (currentSession.streak > gameState.bestStreak) {
+      gameState.bestStreak = currentSession.streak;
+      saveState();
+    }
+    buttons[chosenIndex].classList.add('correct');
+    buttons.forEach(function(b, i) { if (i !== chosenIndex) b.classList.add('dim'); });
+    // Remove from wrong list if they got it right
+    gameState.wrongQuestions = gameState.wrongQuestions.filter(function(id) { return id !== q.id; });
+    saveState();
+  } else {
+    currentSession.streak = 0;
+    buttons[chosenIndex].classList.add('wrong');
+    buttons[q.correct].classList.add('correct');
+    buttons.forEach(function(b, i) {
+      if (i !== chosenIndex && i !== q.correct) b.classList.add('dim');
+    });
+    // Track wrong question
+    if (!currentSession.wrongThisSession.includes(q.id)) {
+      currentSession.wrongThisSession.push(q.id);
+    }
+    if (!gameState.wrongQuestions.includes(q.id)) {
+      gameState.wrongQuestions.push(q.id);
+      saveState();
+    }
+  }
+
+  // Update streak display
+  document.getElementById('quiz-streak').textContent = currentSession.streak;
+
+  // Show explanation
+  const feedbackBox = document.getElementById('feedback-box');
+  const feedbackResult = document.getElementById('feedback-result');
+  const feedbackExp = document.getElementById('feedback-explanation');
+
+  if (isCorrect) {
+    feedbackResult.textContent = '✅ Correct!';
+    feedbackResult.className = 'feedback-result correct';
+  } else {
+    feedbackResult.textContent = '❌ Incorrect';
+    feedbackResult.className = 'feedback-result wrong';
+  }
+  feedbackExp.textContent = q.explanation;
+  feedbackBox.classList.add('show');
+
+  // Show Next/Results button
+  const btnNext = document.getElementById('btn-next');
+  const isLast = currentSession.index >= currentSession.questions.length - 1;
+  btnNext.textContent = isLast ? 'See Results →' : 'Next Question →';
+  btnNext.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════
+//  NEXT QUESTION
+// ═══════════════════════════════════════════════════
+function showNextQuestion() {
+  currentSession.index++;
+  if (currentSession.index >= currentSession.questions.length) {
+    endQuiz();
+  } else {
+    showQuestion();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  END QUIZ
+// ═══════════════════════════════════════════════════
+function endQuiz() {
+  const score = currentSession.score;
+  const total = currentSession.questions.length;
+  const pct = Math.round((score / total) * 100);
+  const bestStreak = currentSession.bestStreakThisSession;
+
+  var emoji, msg;
+  if (pct === 100) {
+    emoji = '🏆'; msg = 'Perfect score! Outstanding seamanship!';
+  } else if (pct >= 80) {
+    emoji = '🎉'; msg = 'Excellent work! You know your Rules of the Road!';
+  } else if (pct >= 60) {
+    emoji = '👍'; msg = 'Good effort — review the weak areas and try again.';
+  } else if (pct >= 40) {
+    emoji = '📚'; msg = 'Keep studying — focus on the topics you missed.';
+  } else {
+    emoji = '⚓'; msg = "Don't give up — every mariner starts somewhere!";
+  }
+
+  document.getElementById('end-emoji').textContent = emoji;
+  document.getElementById('end-score').textContent = score + ' / ' + total;
+  document.getElementById('end-message').textContent = msg;
+  document.getElementById('end-streak').textContent = bestStreak;
+  document.getElementById('end-pct').textContent = pct + '%';
+  document.getElementById('end-all-time-streak').textContent = gameState.bestStreak;
+  document.getElementById('end-weak').textContent = gameState.wrongQuestions.length;
+
+  showScreen('screen-end');
+}
+
+// ═══════════════════════════════════════════════════
+//  EVENT WIRING
+// ═══════════════════════════════════════════════════
+
+// Session length toggle
+document.querySelectorAll('.length-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.length-btn').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+  });
+});
+
+// Start quiz
+document.getElementById('btn-start').addEventListener('click', function() {
+  startQuiz();
+});
+
+// Practice weak areas shortcut
+document.getElementById('btn-weak-home').addEventListener('click', function() {
+  startQuiz('weak');
+});
+
+// Next question
+document.getElementById('btn-next').addEventListener('click', showNextQuestion);
+
+// Home button (from end screen)
+document.getElementById('btn-home').addEventListener('click', function() {
+  updateHomeScreen();
+  showScreen('screen-home');
+});
+
+// Retry same topic
+document.getElementById('btn-retry').addEventListener('click', function() {
+  startQuiz(currentSession.topic);
+});
+
+// ═══════════════════════════════════════════════════
+//  INITIALIZE
+// ═══════════════════════════════════════════════════
+loadState();
+updateHomeScreen();
 </script>
 </body>
 </html>
