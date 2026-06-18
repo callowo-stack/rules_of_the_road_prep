@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Engagement Helper</title>
+  <style>
+    :root {
+      --bg: #0a1628;
+      --surface: #0f2040;
+      --surface2: #162d55;
+      --accent: #1d9bf0;
+      --accent-hover: #1a8cd8;
+      --text: #e7e9ea;
+      --muted: #71767b;
+      --border: #1e3a5f;
+      --success: #00ba7c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header svg { flex-shrink: 0; }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--muted); }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    #status {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 12px 0;
+      min-height: 40px;
+    }
+
+    #status.error { color: #f4212e; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .author-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .author-handle {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .snippet {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .link-btn:hover { background: var(--surface2); }
+
+    .draft-section {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .draft-section.visible { display: flex; }
+
+    .draft-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .draft-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .draft-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .copy-btn:hover { background: var(--surface); color: var(--text); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      text-align: center;
+      padding: 64px 16px;
+      color: var(--muted);
+    }
+
+    .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+    .empty-state p { font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+    </svg>
+    <h1>X Engagement Helper</h1>
+  </header>
+
+  <div class="container">
+    <div class="search-bar">
+      <input type="text" id="queryInput" placeholder="Search topic (e.g. maritime safety, sailing tips)" autocomplete="off">
+      <button class="btn" id="searchBtn" onclick="doSearch()">Search</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const AVATAR_COLORS = [
+      '#1d9bf0','#00ba7c','#7856ff','#ff7a00','#f91880','#ffd400'
+    ];
+
+    let postsData = [];
+
+    const queryInput = document.getElementById('queryInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+
+    const savedQuery = localStorage.getItem('xeh_last_query');
+    if (savedQuery) queryInput.value = savedQuery;
+
+    queryInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.className = isError ? 'error' : '';
+    }
+
+    async function doSearch() {
+      const query = queryInput.value.trim();
+      if (!query) return;
+
+      localStorage.setItem('xeh_last_query', query);
+      postsData = [];
+      resultsEl.innerHTML = '';
+      searchBtn.disabled = true;
+      setStatus('Searching…');
+
+      try {
+        const res = await fetch('/api/search?' + new URLSearchParams({ query }));
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Search failed');
+
+        if (!data.posts.length) {
+          setStatus('No posts found. Try a different search term.');
+          renderEmpty();
+          return;
+        }
+
+        setStatus(`Found ${data.posts.length} post${data.posts.length !== 1 ? 's' : ''}`);
+        postsData = data.posts;
+        renderCards(data.posts);
+      } catch (err) {
+        setStatus(err.message, true);
+      } finally {
+        searchBtn.disabled = false;
+      }
+    }
+
+    function renderEmpty() {
+      resultsEl.innerHTML = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <p>No matching posts found</p>
+        </div>`;
+    }
+
+    function avatarColor(handle) {
+      let hash = 0;
+      for (let i = 0; i < handle.length; i++) hash = handle.charCodeAt(i) + ((hash << 5) - hash);
+      return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+    }
+
+    function renderCards(posts) {
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      posts.forEach((post, idx) => {
+        const initial = (post.author || '?')[0].toUpperCase();
+        const color = avatarColor(post.author || '');
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${idx}`;
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="avatar" style="background:${color}">${initial}</div>
+            <div>
+              <div class="author-name">${escHtml(post.author)}</div>
+              <div class="author-handle">@${escHtml(post.author)}</div>
+            </div>
+          </div>
+          <div class="snippet">${escHtml(post.snippet)}</div>
+          <div class="card-actions">
+            <a class="link-btn" href="${escAttr(post.link)}" target="_blank" rel="noopener noreferrer">
+              View on X
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+              </svg>
+            </a>
+            <button class="btn btn-sm" onclick="generateDraft(${idx})">Draft Reply</button>
+          </div>
+          <div class="draft-section" id="draft-${idx}">
+            <div>
+              <div class="draft-label">Reply (10 words)</div>
+              <div class="draft-row">
+                <div class="draft-text" id="reply-${idx}"></div>
+                <button class="copy-btn" onclick="copyText('reply-${idx}', this)">Copy</button>
+              </div>
+            </div>
+            <div>
+              <div class="draft-label">Image Prompt</div>
+              <div class="draft-row">
+                <div class="draft-text" id="imgprompt-${idx}"></div>
+                <button class="copy-btn" onclick="copyText('imgprompt-${idx}', this)">Copy</button>
+              </div>
+            </div>
+          </div>`;
+
+        grid.appendChild(card);
+      });
+
+      resultsEl.appendChild(grid);
+    }
+
+    async function generateDraft(idx) {
+      const post = postsData[idx];
+      if (!post) return;
+
+      const draftBtn = document.querySelector(`#card-${idx} .btn-sm`);
+      const draftSection = document.getElementById(`draft-${idx}`);
+
+      draftBtn.disabled = true;
+      draftBtn.innerHTML = '<span class="spinner"></span>Drafting…';
+
+      try {
+        const res = await fetch('/api/draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ snippet: post.snippet, author: post.author }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Draft failed');
+
+        document.getElementById(`reply-${idx}`).textContent = data.reply || '';
+        document.getElementById(`imgprompt-${idx}`).textContent = data.imagePrompt || '';
+        draftSection.classList.add('visible');
+        draftBtn.textContent = 'Redraft';
+      } catch (err) {
+        draftBtn.textContent = 'Error — Retry';
+        alert('Failed to generate draft: ' + err.message);
+      } finally {
+        draftBtn.disabled = false;
+      }
+    }
+
+    function copyText(elementId, btn) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 1800);
+      });
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escAttr(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>
