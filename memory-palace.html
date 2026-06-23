@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maritime Memory Palace — COLREGS Visual Study Aid</title>
+<style>
+:root {
+  --bg: #0a1628;
+  --card: #112240;
+  --card2: #1a3050;
+  --text: #e8f4fd;
+  --text-muted: #8ab4d4;
+  --gold: #f0c040;
+  --gold-dark: #c89a20;
+  --border: #1e3a5f;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-back {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--gold); }
+.nav-title { font-size: 1.15rem; font-weight: 800; color: var(--gold); }
+.nav-hint { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 28px 24px 16px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.hero h1 { font-size: 2rem; font-weight: 900; color: var(--gold); margin-bottom: 8px; letter-spacing: -0.5px; }
+.hero p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+.hero .tip {
+  display: inline-block;
+  margin-top: 12px;
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.25);
+  border-radius: 999px;
+  padding: 5px 16px;
+  font-size: 0.82rem;
+  color: var(--gold);
+}
+
+/* ── MAIN LAYOUT ── */
+.palace-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px 32px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .palace-section { grid-template-columns: 1fr; }
+}
+
+/* ── SHIP CONTAINER ── */
+.ship-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  padding: 16px 16px 8px;
+}
+.ship-wrap svg { width: 100%; height: auto; display: block; }
+.ship-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 10px 4px 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── SVG ZONE STYLES ── */
+.zone-area {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.zone-fill {
+  transition: opacity 0.2s, filter 0.2s;
+}
+.zone-area:hover .zone-fill { filter: brightness(1.4) saturate(1.2); }
+.zone-area.active .zone-fill {
+  filter: brightness(1.6) saturate(1.3) drop-shadow(0 0 8px currentColor);
+  stroke-width: 2.5 !important;
+}
+.zone-lbl {
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+/* ── DETAIL PANEL ── */
+.detail-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: sticky;
+  top: 62px;
+}
+.detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  gap: 12px;
+  color: var(--text-muted);
+  min-height: 320px;
+}
+.detail-empty .empty-ship { font-size: 3rem; opacity: 0.4; }
+.detail-empty strong { display: block; color: var(--text); font-size: 1rem; margin-bottom: 4px; }
+.detail-empty p { font-size: 0.88rem; }
+
+.detail-content { display: none; padding: 24px; overflow-y: auto; max-height: 82vh; }
+.detail-content.show { display: block; }
+
+.detail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.detail-zone-name { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; }
+.detail-zone-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; }
+
+.memory-anchor {
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--gold);
+  line-height: 1.55;
+}
+.memory-anchor::before { content: '💡 '; }
+
+.rules-stack { display: flex; flex-direction: column; gap: 12px; }
+
+.rule-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.rule-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.rule-num-badge {
+  background: var(--gold);
+  color: #0a1628;
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rule-title { font-weight: 700; font-size: 0.95rem; }
+.rule-body { padding: 10px 14px; }
+.rule-key { font-size: 0.84rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 10px; }
+.rule-trick {
+  font-size: 0.83rem;
+  line-height: 1.55;
+  background: rgba(139,92,246,0.1);
+  border-left: 3px solid #8b5cf6;
+  color: #c4b5fd;
+  padding: 8px 10px;
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── GRID SECTION ── */
+.grid-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+.section-head {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--gold);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.zones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 14px;
+}
+.zone-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.zone-card:hover { border-color: rgba(240,192,64,0.35); background: var(--card2); }
+.zone-card.active { border-color: var(--gold); background: var(--card2); }
+.zone-card-head { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 10px; }
+.zone-card-icon { font-size: 1.7rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.zone-card-name { font-weight: 800; font-size: 0.95rem; }
+.zone-card-sub { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
+.zone-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.zone-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+.zone-card-memory { font-size: 0.8rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.detail-content.show { animation: fadeIn 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-back">← Quiz Tool</a>
+  <div class="nav-title">⚓ Memory Palace</div>
+  <div class="nav-hint">Click any zone</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>The Maritime Memory Palace</h1>
+  <p>Every COLREGS rule has a permanent home on this ship.<br>
+  Walk from the keel to the crow's nest — each zone holds different rules and the tricks to remember them.</p>
+  <span class="tip">🖱️ Click any highlighted zone on the ship, or any card below</span>
+</div>
+
+<!-- PALACE: Ship + Detail Panel -->
+<div class="palace-section">
+
+  <!-- SHIP SVG -->
+  <div class="ship-wrap">
+    <svg viewBox="0 0 1000 430" xmlns="http://www.w3.org/2000/svg" id="ship-svg">
+      <defs>
+        <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#071020"/>
+          <stop offset="100%" stop-color="#030810"/>
+        </linearGradient>
+        <linearGradient id="hullGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e3a5f"/>
+          <stop offset="100%" stop-color="#0e2040"/>
+        </linearGradient>
+        <linearGradient id="superGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#163060"/>
+          <stop offset="100%" stop-color="#0e2040"/>
+        </linearGradient>
+        <filter id="softglow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Ocean -->
+      <rect width="1000" height="430" fill="url(#seaGrad)"/>
+      <!-- Stars (decorative) -->
+      <circle cx="80" cy="18" r="1" fill="white" opacity="0.4"/>
+      <circle cx="200" cy="8" r="1.2" fill="white" opacity="0.3"/>
+      <circle cx="330" cy="22" r="1" fill="white" opacity="0.4"/>
+      <circle cx="500" cy="10" r="1.5" fill="white" opacity="0.3"/>
+      <circle cx="650" cy="18" r="1" fill="white" opacity="0.4"/>
+      <circle cx="800" cy="6" r="1.2" fill="white" opacity="0.3"/>
+      <circle cx="920" cy="14" r="1" fill="white" opacity="0.4"/>
+
+      <!-- ── SHIP STRUCTURE ── -->
+      <!-- Hull (main body) -->
+      <path d="M 95,345 L 55,315 L 38,278 L 50,248 L 105,228 L 930,228 L 958,252 L 970,288 L 962,338 L 962,362 L 95,362 Z"
+            fill="url(#hullGrad)" stroke="#2a4a7f" stroke-width="1.5"/>
+
+      <!-- Waterline stripe -->
+      <path d="M 95,345 L 55,315 L 38,278 Q 40,265 52,255" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+      <line x1="52" y1="255" x2="962" y2="338" stroke="#3b82f6" stroke-width="1" stroke-dasharray="10,5" opacity="0.25"/>
+
+      <!-- Forecastle (bow raised deck) -->
+      <rect x="105" y="193" width="165" height="36" rx="2" fill="url(#superGrad)" stroke="#2a5080" stroke-width="1"/>
+
+      <!-- Bridge / Wheelhouse body -->
+      <rect x="335" y="128" width="245" height="100" rx="3" fill="url(#superGrad)" stroke="#2a5080" stroke-width="1.5"/>
+      <!-- Bridge windows -->
+      <rect x="350" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+      <rect x="388" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+      <rect x="426" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+      <rect x="464" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+      <rect x="502" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+      <rect x="540" y="143" width="28" height="18" rx="2" fill="#071020" stroke="#1e4080" stroke-width="1"/>
+
+      <!-- Aft superstructure -->
+      <rect x="645" y="162" width="185" height="66" rx="2" fill="url(#superGrad)" stroke="#2a5080" stroke-width="1"/>
+
+      <!-- Funnel / smokestack -->
+      <rect x="772" y="92" width="48" height="74" rx="2" fill="#1a3050" stroke="#2a4a7f" stroke-width="1.5"/>
+      <rect x="778" y="86" width="36" height="14" rx="2" fill="#c89a20"/>
+      <!-- Smoke puffs -->
+      <circle cx="796" cy="72" r="8" fill="#1a2a3a" opacity="0.6"/>
+      <circle cx="806" cy="60" r="6" fill="#1a2a3a" opacity="0.4"/>
+      <circle cx="814" cy="50" r="4" fill="#1a2a3a" opacity="0.25"/>
+
+      <!-- Foremast -->
+      <line x1="182" y1="38" x2="182" y2="193" stroke="#3a5a7a" stroke-width="3"/>
+      <line x1="150" y1="88" x2="214" y2="88" stroke="#3a5a7a" stroke-width="2"/>
+      <!-- Foremast yard arms -->
+      <line x1="155" y1="108" x2="209" y2="108" stroke="#3a5a7a" stroke-width="1.5"/>
+
+      <!-- Mainmast (bridge top) -->
+      <line x1="460" y1="56" x2="460" y2="128" stroke="#3a5a7a" stroke-width="3"/>
+      <line x1="430" y1="80" x2="490" y2="80" stroke="#3a5a7a" stroke-width="2"/>
+
+      <!-- Rigging stays (decorative) -->
+      <line x1="42" y1="248" x2="182" y2="38" stroke="#1e3050" stroke-width="1" stroke-dasharray="5,5"/>
+      <line x1="182" y1="38" x2="460" y2="56" stroke="#1e3050" stroke-width="1" stroke-dasharray="5,5"/>
+
+      <!-- Anchor chain -->
+      <path d="M 72,260 Q 68,290 68,348" stroke="#3a5a7a" stroke-width="2" fill="none" stroke-dasharray="5,4"/>
+      <!-- Anchor icon -->
+      <circle cx="72" cy="258" r="14" fill="none" stroke="#4a6a8a" stroke-width="2"/>
+      <line x1="72" y1="244" x2="72" y2="272" stroke="#4a6a8a" stroke-width="2"/>
+      <line x1="60" y1="272" x2="84" y2="272" stroke="#4a6a8a" stroke-width="2"/>
+      <line x1="60" y1="272" x2="62" y2="266" stroke="#4a6a8a" stroke-width="1.5"/>
+      <line x1="84" y1="272" x2="82" y2="266" stroke="#4a6a8a" stroke-width="1.5"/>
+
+      <!-- Propeller at stern -->
+      <circle cx="966" cy="335" r="18" fill="none" stroke="#2a4060" stroke-width="1.5"/>
+      <line x1="966" y1="317" x2="966" y2="353" stroke="#2a4060" stroke-width="2"/>
+      <line x1="948" y1="335" x2="984" y2="335" stroke="#2a4060" stroke-width="2"/>
+      <line x1="953" y1="322" x2="979" y2="348" stroke="#2a4060" stroke-width="1.5"/>
+      <line x1="979" y1="322" x2="953" y2="348" stroke="#2a4060" stroke-width="1.5"/>
+
+      <!-- Navigation lights (decorative glow dots) -->
+      <!-- Port red light -->
+      <circle cx="333" cy="173" r="5" fill="#ef4444" filter="url(#softglow)" opacity="0.9"/>
+      <!-- Starboard green light -->
+      <circle cx="582" cy="173" r="5" fill="#22c55e" filter="url(#softglow)" opacity="0.9"/>
+      <!-- Masthead white light on main mast -->
+      <circle cx="460" cy="60" r="6" fill="#f0c040" filter="url(#softglow)" opacity="0.95"/>
+      <!-- Masthead light on foremast -->
+      <circle cx="182" cy="42" r="5" fill="white" filter="url(#softglow)" opacity="0.75"/>
+      <!-- Sternlight -->
+      <circle cx="962" cy="258" r="4" fill="white" filter="url(#softglow)" opacity="0.65"/>
+
+      <!-- Water ripple lines -->
+      <ellipse cx="510" cy="390" rx="440" ry="14" fill="none" stroke="#1e3a5f" stroke-width="1" opacity="0.35"/>
+      <ellipse cx="510" cy="408" rx="390" ry="11" fill="none" stroke="#1e3a5f" stroke-width="1" opacity="0.22"/>
+
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 1 — CROW'S NEST  (Rule 5)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="lookout" onclick="selectZone('lookout')" role="button" aria-label="Crow's Nest - Rule 5">
+        <rect x="150" y="22" width="64" height="44" rx="6" fill="#f59e0b" opacity="0.22" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.7" class="zone-fill"/>
+        <text x="182" y="40" class="zone-lbl" font-size="15" fill="#fcd34d">👁️</text>
+        <text x="182" y="53" class="zone-lbl" font-size="8.5" fill="#fde68a">CROW'S NEST</text>
+        <text x="182" y="62" class="zone-lbl" font-size="7.5" fill="#fbbf24" opacity="0.8">Rule 5</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 2 — FOREMAST / LIGHT DEFINITIONS (Rules 20-22)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="lights" onclick="selectZone('lights')" role="button" aria-label="Mast and Navigation Lights">
+        <rect x="148" y="70" width="68" height="52" rx="4" fill="#f97316" opacity="0.2" stroke="#f97316" stroke-width="1.5" stroke-opacity="0.65" class="zone-fill"/>
+        <text x="182" y="90" class="zone-lbl" font-size="15" fill="#fdba74">💡</text>
+        <text x="182" y="105" class="zone-lbl" font-size="8.5" fill="#fed7aa">MAST LIGHTS</text>
+        <text x="182" y="115" class="zone-lbl" font-size="7.5" fill="#fb923c" opacity="0.85">Rr 20–22</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 3 — BRIDGE (Rules 6, 7, 8)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="bridge" onclick="selectZone('bridge')" role="button" aria-label="Bridge - Rules 6 7 8">
+        <rect x="338" y="131" width="240" height="94" rx="4" fill="#3b82f6" opacity="0.22" stroke="#60a5fa" stroke-width="2" stroke-opacity="0.8" class="zone-fill"/>
+        <text x="458" y="170" class="zone-lbl" font-size="18" fill="#93c5fd">⚙️</text>
+        <text x="458" y="191" class="zone-lbl" font-size="9.5" fill="#bfdbfe">THE BRIDGE</text>
+        <text x="458" y="204" class="zone-lbl" font-size="7.5" fill="#93c5fd" opacity="0.9">Rules 6 · 7 · 8</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 4 — FOGHORN (Rules 32-37)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="foghorn" onclick="selectZone('foghorn')" role="button" aria-label="Foghorn - Sound Signals">
+        <rect x="598" y="128" width="78" height="58" rx="4" fill="#8b5cf6" opacity="0.22" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.7" class="zone-fill"/>
+        <text x="637" y="152" class="zone-lbl" font-size="15" fill="#c4b5fd">📯</text>
+        <text x="637" y="168" class="zone-lbl" font-size="8.5" fill="#ddd6fe">FOGHORN</text>
+        <text x="637" y="179" class="zone-lbl" font-size="7.5" fill="#a78bfa" opacity="0.9">Rr 32–37</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 5 — BOW (Rule 14: Head-on)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="bow" onclick="selectZone('bow')" role="button" aria-label="Bow - Rule 14 Head-on">
+        <ellipse cx="68" cy="284" rx="34" ry="42" fill="#ec4899" opacity="0.18" stroke="#f472b6" stroke-width="1.5" stroke-opacity="0.7" class="zone-fill"/>
+        <text x="68" y="275" class="zone-lbl" font-size="13" fill="#fce7f3">🚢</text>
+        <text x="68" y="290" class="zone-lbl" font-size="8" fill="#fbcfe8">BOW</text>
+        <text x="68" y="301" class="zone-lbl" font-size="7" fill="#f9a8d4" opacity="0.9">Rule 14</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 6 — PORT SIDE (Rules 12, 13)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="port" onclick="selectZone('port')" role="button" aria-label="Port side - Rules 12 13">
+        <rect x="104" y="228" width="228" height="94" rx="4" fill="#ef4444" opacity="0.18" stroke="#f87171" stroke-width="1.5" stroke-opacity="0.65" class="zone-fill"/>
+        <text x="218" y="265" class="zone-lbl" font-size="14" fill="#fecaca">🔴</text>
+        <text x="218" y="283" class="zone-lbl" font-size="9" fill="#fca5a5">PORT SIDE</text>
+        <text x="218" y="296" class="zone-lbl" font-size="7.5" fill="#f87171" opacity="0.9">Rules 12 · 13</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 7 — STARBOARD SIDE (Rules 15-18)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="starboard" onclick="selectZone('starboard')" role="button" aria-label="Starboard side - Rules 15-18">
+        <rect x="588" y="228" width="278" height="94" rx="4" fill="#22c55e" opacity="0.18" stroke="#4ade80" stroke-width="1.5" stroke-opacity="0.65" class="zone-fill"/>
+        <text x="727" y="265" class="zone-lbl" font-size="14" fill="#bbf7d0">🟢</text>
+        <text x="727" y="283" class="zone-lbl" font-size="9" fill="#86efac">STARBOARD</text>
+        <text x="727" y="296" class="zone-lbl" font-size="7.5" fill="#4ade80" opacity="0.9">Rules 15 · 16 · 17 · 18</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 8 — STERN (Rule 13: Overtaking)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="stern" onclick="selectZone('stern')" role="button" aria-label="Stern - Rule 13 Overtaking">
+        <ellipse cx="950" cy="280" rx="26" ry="52" fill="#f0c040" opacity="0.16" stroke="#f0c040" stroke-width="1.5" stroke-opacity="0.6" class="zone-fill"/>
+        <text x="950" y="269" class="zone-lbl" font-size="12" fill="#fef08a">⬡</text>
+        <text x="950" y="283" class="zone-lbl" font-size="8" fill="#fde047">STERN</text>
+        <text x="950" y="294" class="zone-lbl" font-size="7" fill="#f0c040" opacity="0.9">Rule 13</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 9 — ENGINE ROOM (Rules 23-29: Vessel Lights)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="engine" onclick="selectZone('engine')" role="button" aria-label="Engine Room - Rules 23-29">
+        <rect x="686" y="268" width="250" height="88" rx="4" fill="#f97316" opacity="0.18" stroke="#fb923c" stroke-width="1.5" stroke-opacity="0.65" class="zone-fill"/>
+        <text x="811" y="300" class="zone-lbl" font-size="14" fill="#fed7aa">⚙️</text>
+        <text x="811" y="318" class="zone-lbl" font-size="9" fill="#fdba74">ENGINE ROOM</text>
+        <text x="811" y="331" class="zone-lbl" font-size="7.5" fill="#fb923c" opacity="0.9">Rules 23–29 (Vessel Lights)</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 10 — ANCHOR LOCKER (Rule 30)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="anchor" onclick="selectZone('anchor')" role="button" aria-label="Anchor - Rule 30">
+        <rect x="102" y="330" width="158" height="28" rx="4" fill="#64748b" opacity="0.35" stroke="#94a3b8" stroke-width="1.5" stroke-opacity="0.6" class="zone-fill"/>
+        <text x="181" y="349" class="zone-lbl" font-size="8" fill="#cbd5e1">⚓ ANCHOR LOCKER — Rule 30</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 11 — KEEL / HULL (Rules 1, 2, 3)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="keel" onclick="selectZone('keel')" role="button" aria-label="Keel - Rules 1 2 3">
+        <rect x="264" y="330" width="416" height="28" rx="4" fill="#0ea5e9" opacity="0.28" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.7" class="zone-fill"/>
+        <text x="472" y="349" class="zone-lbl" font-size="8" fill="#7dd3fc">🌊 KEEL — Rules 1 · 2 · 3 (Foundation)</text>
+      </g>
+
+      <!-- ═══════════════════════════════════════════
+           ZONE 12 — CHANNELS / TSS / FOG (Rules 9, 10, 19)
+      ═══════════════════════════════════════════ -->
+      <g class="zone-area" data-zone="channels" onclick="selectZone('channels')" role="button" aria-label="Channels TSS Fog - Rules 9 10 19">
+        <rect x="95" y="365" width="868" height="42" rx="4" fill="#14b8a6" opacity="0.18" stroke="#2dd4bf" stroke-width="1.5" stroke-opacity="0.65" class="zone-fill"/>
+        <text x="529" y="382" class="zone-lbl" font-size="12" fill="#5eead4">🌊</text>
+        <text x="529" y="398" class="zone-lbl" font-size="8" fill="#99f6e4">CHANNELS · TRAFFIC SEPARATION · FOG — Rules 9 · 10 · 19</text>
+      </g>
+    </svg>
+
+    <!-- Legend -->
+    <div class="ship-legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Lookout (R5)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Lights (R20-22)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> Bridge (R6-8)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span> Horn (R32-37)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ec4899"></span> Bow (R14)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span> Port (R12-13)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> Starboard (R15-18)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#f0c040"></span> Stern (R13)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Engine (R23-29)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#64748b"></span> Anchor (R30)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#0ea5e9"></span> Keel (R1-3)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#14b8a6"></span> Channels (R9,10,19)</span>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <aside class="detail-panel">
+    <div class="detail-empty" id="detail-empty">
+      <div class="empty-ship">⚓</div>
+      <strong>Click any zone on the ship</strong>
+      <p>Each part of the vessel holds specific COLREGS rules and the memory tricks to lock them in.</p>
+    </div>
+    <div class="detail-content" id="detail-content"></div>
+  </aside>
+</div>
+
+<!-- ALL ZONES GRID -->
+<div class="grid-section">
+  <div class="section-head">🗺️ All Palace Zones — Quick Reference</div>
+  <div class="zones-grid" id="zones-grid"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  ZONE DATA
+// ═══════════════════════════════════════════════════
+const ZONES = {
+
+  keel: {
+    id: 'keel',
+    name: 'The Keel',
+    subtitle: 'Rules 1, 2, 3 — Foundation of All COLREGS',
+    emoji: '🌊',
+    color: '#0ea5e9',
+    light: '#bae6fd',
+    bg: 'rgba(14,165,233,0.1)',
+    rules: ['1', '2', '3'],
+    memory: 'The keel runs the full length of the ship — it IS the ship. Rules 1-3 are the full foundation of COLREGS: where they apply, who stays responsible, and what every word means.',
+    details: [
+      {
+        num: '1',
+        title: 'Application',
+        key: 'Applies to ALL vessels upon the high seas and all waters connected therewith navigable by seagoing vessels. Inland Rules cover US navigable inland waters.',
+        trick: '🌍 "ALL vessels, ALL waters." No exceptions hidden in the keel. International rules = open ocean + connected channels. The word ALL appears deliberately — no vessel type is exempt.'
+      },
+      {
+        num: '2',
+        title: 'Responsibility',
+        key: 'Nothing in the rules exonerates any vessel from consequences of neglect or failure to observe good seamanship. The "General Prudential Rule": if following the rules strictly would cause a collision, DEPART from them.',
+        trick: '⚖️ "The rules don\'t make you invincible." You\'re the captain — always. ALSO: if blindly following a rule leads to collision, break it. Common sense is mandatory, not optional.'
+      },
+      {
+        num: '3',
+        title: 'General Definitions',
+        key: 'KEY TERMS: Vessel = every watercraft (including WIG/seaplanes). Power-driven = using machinery. Sailing = sail only, NO machinery in use. NUC = unable to maneuver due to exceptional circumstance. RAM = nature of work limits maneuverability. CBD = draft vs. available depth limits deviation. Underway = not at anchor, moored, or aground. Making way = actually moving through water.',
+        trick: '📖 "Underway ≠ Moving." This trips everyone up. Underway = not anchored/moored/aground (a drifting vessel is underway!). Making way = engine or sail actually pushing through water. This distinction controls which fog signals you use.'
+      }
+    ]
+  },
+
+  lookout: {
+    id: 'lookout',
+    name: 'The Crow\'s Nest',
+    subtitle: 'Rule 5 — Look-out',
+    emoji: '👁️',
+    color: '#f59e0b',
+    light: '#fde68a',
+    bg: 'rgba(245,158,11,0.1)',
+    rules: ['5'],
+    memory: '"From the crow\'s nest, you ALWAYS watch." The lookout never sleeps. Sight, hearing, radar, AIS — every tool available, all the time.',
+    details: [
+      {
+        num: '5',
+        title: 'Look-out',
+        key: 'Every vessel shall at ALL TIMES maintain a proper lookout by sight and hearing as well as by all available means appropriate to the prevailing circumstances, so as to make a full appraisal of the situation and of the risk of collision.',
+        trick: '🦅 "ALL TIMES — no exceptions." No breaks, no \"only in restricted visibility.\" ALL available means = sight + hearing + radar + AIS + VHF + any other tool. This is the most absolute rule in COLREGS. If you miss a collision risk, Rule 5 is always cited.'
+      }
+    ]
+  },
+
+  lights: {
+    id: 'lights',
+    name: 'The Mast & Signal Lights',
+    subtitle: 'Rules 20, 21, 22 — Light Definitions',
+    emoji: '💡',
+    color: '#f97316',
+    light: '#fed7aa',
+    bg: 'rgba(249,115,22,0.1)',
+    rules: ['20', '21', '22'],
+    memory: '"225° forward + 135° aft = 360°. Two sidelights × 112.5° = the masthead arc. The math is elegant — everything fits perfectly."',
+    details: [
+      {
+        num: '20',
+        title: 'Application of Lights',
+        key: 'Lights required from sunset to sunrise. Also required in restricted visibility during daylight. Vessels shall not show lights that could be mistaken for navigation lights.',
+        trick: '🌙 "Lights on at sunset, off at sunrise — PLUS any time you can\'t see well." The no-confusion clause matters: don\'t run decklights that look like sidelights.'
+      },
+      {
+        num: '21',
+        title: 'Definitions — Light Arcs',
+        key: 'MASTHEAD: white, 225° arc (112.5° each side of ahead). SIDELIGHT: red (port) or green (stbd), each 112.5° from dead ahead to 22.5° abaft the beam. STERNLIGHT: white, 135° (67.5° each side of dead astern). ALL-ROUND: 360°. TOWING LIGHT: yellow, same 135° arc as sternlight.',
+        trick: '🔢 "The geometry check: Masthead 225° + Sternlight 135° = 360°. The two sidelights (112.5° each × 2 = 225°) exactly mirror the masthead arc. A vessel\'s own lights cover a full 360° circle — nothing left in the dark."'
+      },
+      {
+        num: '22',
+        title: 'Visibility of Lights',
+        key: '≥50m vessels: masthead 6 miles, sidelights 3 miles, sternlight 3 miles, towing/all-round 3 miles. 12–50m: masthead 5 miles (or 3 miles if <20m), sidelights and sternlight 2 miles. <12m: 2 miles all-round white OR sidelights 1 mile + stern 2 miles.',
+        trick: '📏 "Bigger ship = seen farther." The key threshold is 50m. Masthead light always reaches farthest. <12m vessels have more flexible options because they\'re often in marinas and anchorages.'
+      }
+    ]
+  },
+
+  bridge: {
+    id: 'bridge',
+    name: 'The Bridge',
+    subtitle: 'Rules 6, 7, 8 — Command Decisions',
+    emoji: '⚙️',
+    color: '#3b82f6',
+    light: '#bfdbfe',
+    bg: 'rgba(59,130,246,0.1)',
+    rules: ['6', '7', '8'],
+    memory: '"The captain on the bridge makes three decisions: How fast? (R6) Is there risk? (R7) How do I act? (R8). Safe, Watchful, Bold."',
+    details: [
+      {
+        num: '6',
+        title: 'Safe Speed',
+        key: 'Every vessel shall at ALL TIMES proceed at a safe speed. Factors: state of visibility, traffic density, vessel maneuverability (especially stopping distance and turning ability), background lights at night, state of wind/sea/current, draft vs. available depth, radar capability and limitations.',
+        trick: '🚗 "Like driving — conditions dictate your speed." The rule lists factors but gives no specific numbers. Fog = slow down. Dense traffic = slow down. Poor radar = slow down. The word ALL TIMES appears again — safe speed is a constant requirement, not situational.'
+      },
+      {
+        num: '7',
+        title: 'Risk of Collision',
+        key: 'Use ALL available means to determine collision risk. If radar is fitted, use it properly and systematically, including long-range scanning. CONSTANT BEARING + DECREASING RANGE = collision risk. If in DOUBT whether risk exists — it SHALL be deemed to EXIST.',
+        trick: '📡 "Steady bearing = DANGER." Imagine a gun aimed at you: if the angle never changes, the bullet hits. In doubt? The rule says risk EXISTS — err on the side of caution. Scanty radar information is NOT enough to confirm safety.'
+      },
+      {
+        num: '8',
+        title: 'Action to Avoid Collision',
+        key: 'Action shall be: POSITIVE (large enough to be obvious to the other vessel), made in AMPLE TIME, result in passing at SAFE DISTANCE. Avoid a SUCCESSION of small alterations — one large, clear maneuver is better. If necessary: slow, stop, or go astern. Check that the action is working before reaching the danger zone.',
+        trick: '💪 "Make a BIG move, EARLY." Small wiggles confuse — a 30° course change looks intentional. Multiple small changes look like indecision. One big clear action early leaves no doubt. And yes, stopping is always an option.'
+      }
+    ]
+  },
+
+  foghorn: {
+    id: 'foghorn',
+    name: 'The Foghorn',
+    subtitle: 'Rules 32–37 — Sound & Light Signals',
+    emoji: '📯',
+    color: '#8b5cf6',
+    light: '#ddd6fe',
+    bg: 'rgba(139,92,246,0.1)',
+    rules: ['32', '33', '34', '35', '36', '37'],
+    memory: '"1=starboard, 2=port, 3=astern, 5+=DANGER. In fog: 1 long blast every 2 minutes if underway and making way."',
+    details: [
+      {
+        num: '32',
+        title: 'Definitions — Blast Lengths',
+        key: 'SHORT blast ≈ 1 second. PROLONGED blast = 4 to 6 seconds.',
+        trick: '⏱️ "Short = snap your fingers (~1 sec). Prolonged = count one-one-thousand, two-one-thousand, three-one-thousand, four — that\'s the minimum. Up to 6 seconds maximum."'
+      },
+      {
+        num: '34',
+        title: 'Maneuvering & Warning Signals',
+        key: 'In sight of another vessel: 1 short = altering to STARBOARD. 2 short = altering to PORT. 3 short = operating engines ASTERN. 5+ short/rapid = DANGER or DOUBT signal. (Inland only: 1 prolonged + 1 short = passing port-to-port agreement; 1 prolonged + 2 short = passing starboard-to-starboard.)',
+        trick: '🖐️ "Count your fingers: ONE right, TWO left, THREE back, FIVE = DANGER." Under COLREGS these are MANEUVERING signals — you sound them when you act. Under Inland Rules, they\'re INTENT signals — you sound before you act and wait for agreement.'
+      },
+      {
+        num: '35',
+        title: 'Sound Signals in Restricted Visibility',
+        key: 'Power vessel MAKING WAY: 1 prolonged blast ≤every 2 min. Power vessel STOPPED (not making way): 2 prolonged blasts ≤every 2 min. Sailing vessel, NUC, RAM, CBD, fishing, towing/towed: 1 prolonged + 2 short (— • •) ≤every 2 min. AT ANCHOR <100m: rapid bell (~5 sec) ≤every 1 min. AT ANCHOR ≥100m: bell forward + gong aft ≤every 1 min.',
+        trick: '🌫️ "Making way = 1 long. Stopped (engines running) = 2 long. Everything special = .- - (dit-dah-dah). Anchor = DING DING DING (bell). Key insight: a sailing vessel sounds .- - even though it has right-of-way over power — in fog, there\'s no hierarchy."'
+      },
+      {
+        num: '36',
+        title: 'Signals to Attract Attention',
+        key: 'Any vessel may use light or sound signals that cannot be mistaken for any signal prescribed by the rules. May also shine a spotlight on own sails or hull in direction of danger.',
+        trick: '📣 "Make noise, shine light — but don\'t trigger false alarms." No rockets or red flares unless you\'re actually in distress. A searchlight on your sails = \'look at me, I\'m here.\''
+      },
+      {
+        num: '37',
+        title: 'Distress Signals',
+        key: 'Distress signals include: gun or explosive at ~1 min intervals, SOS (... --- ...) by any means, Mayday by radio, NC flag + ball, flames on vessel, orange smoke, slowly raising and lowering outstretched arms, EPIRB activation, red rocket/parachute flares, dye marker, high-intensity white light flashing 50-70 times/min.',
+        trick: '🆘 "SOS = dit-dit-dit, dah-dah-dah, dit-dit-dit. Orange smoke = daytime. Red flares = nighttime. Raising/lowering arms = the silent wave of a drowning person. EPIRB = automatic satellite beacon. The key: use any combination, but use recognized signals."'
+      }
+    ]
+  },
+
+  bow: {
+    id: 'bow',
+    name: 'The Bow',
+    subtitle: 'Rule 14 — Head-on Situation',
+    emoji: '🚢',
+    color: '#ec4899',
+    light: '#fbcfe8',
+    bg: 'rgba(236,72,153,0.1)',
+    rules: ['14'],
+    memory: '"Bow to bow — BOTH swing to starboard. Pass port-to-port. Like cars on a road: both drive on the right."',
+    details: [
+      {
+        num: '14',
+        title: 'Head-on Situation',
+        key: 'When two POWER-DRIVEN vessels are approaching on reciprocal or nearly reciprocal courses creating risk of collision, EACH shall alter course to STARBOARD so they pass port-to-port. When in doubt about whether a head-on situation exists — ASSUME it does and act accordingly.',
+        trick: '🚗 "Two cars meeting head-on: both drive RIGHT (starboard). Ships do the same." Signs you\'re in a head-on: you see both sidelights (red and green) plus the masthead light dead ahead. If you only see one sidelight, it\'s likely a crossing, not head-on. When in doubt — assume head-on, go starboard.'
+      }
+    ]
+  },
+
+  port: {
+    id: 'port',
+    name: 'The Port (Left) Side',
+    subtitle: 'Rules 12, 13 — Sailing Vessels & Overtaking',
+    emoji: '🔴',
+    color: '#ef4444',
+    light: '#fecaca',
+    bg: 'rgba(239,68,68,0.1)',
+    rules: ['12', '13'],
+    memory: '"Red = Port = Left. If your wind is on the PORT (red/left) side, you GIVE WAY."',
+    details: [
+      {
+        num: '12',
+        title: 'Sailing Vessels',
+        key: 'Two sailing vessels meeting: (1) Different tacks — the vessel on PORT tack gives way. (2) Same tack — the WINDWARD vessel gives way to the leeward vessel. (3) Port-tack vessel cannot determine the other\'s tack — give way if YOU are on PORT tack.',
+        trick: '💨 "PORT tack GIVES WAY — both times." If wind hits your LEFT (port) side first, you\'re on port tack — you give way. Windward = upwind, you\'re above the other vessel — you also give way (you can see them better). Memory: \'I\'m on the RED side = I yield.\''
+      },
+      {
+        num: '13',
+        title: 'Overtaking — The Setup',
+        key: 'ANY vessel (power or sail) that is overtaking another is the give-way vessel. You are overtaking if you are coming up on another vessel from a direction MORE THAN 22.5° ABAFT THE BEAM (within the sternlight arc of 135°). Once overtaking, ALWAYS overtaking — you cannot escape the obligation by maneuvering into an apparent crossing situation.',
+        trick: '🏃 "If you\'re in the cone of their white sternlight (135° arc), you\'re overtaking." The 22.5° abaft the beam = the edge of the sidelight and sternlight overlap. \'Once overtaking, always overtaking\' prevents games where the overtaker pretends to be in a crossing to claim stand-on status.'
+      }
+    ]
+  },
+
+  starboard: {
+    id: 'starboard',
+    name: 'The Starboard (Right) Side',
+    subtitle: 'Rules 15, 16, 17, 18 — Crossing & Give-way/Stand-on',
+    emoji: '🟢',
+    color: '#22c55e',
+    light: '#bbf7d0',
+    bg: 'rgba(34,197,94,0.1)',
+    rules: ['15', '16', '17', '18'],
+    memory: '"See their GREEN light coming at you? They\'re showing you their starboard = YOU are on their right side = YOU give way. Act EARLY and SUBSTANTIALLY."',
+    details: [
+      {
+        num: '15',
+        title: 'Crossing Situation',
+        key: 'When two power-driven vessels cross and risk of collision exists: the vessel that has the other on HER OWN STARBOARD SIDE shall give way. Give-way vessel shall AVOID crossing ahead of the stand-on vessel — pass ASTERN instead.',
+        trick: '🟢 "See their green light = you see their starboard = they\'re to YOUR right = you give way." The green light is a green light for the other vessel — not for you. You must yield. Avoid cutting across their bow; go behind them.'
+      },
+      {
+        num: '16',
+        title: 'Action by Give-way Vessel',
+        key: 'The give-way vessel shall take EARLY and SUBSTANTIAL action to keep WELL CLEAR.',
+        trick: '⏰ "EARLY = don\'t wait. SUBSTANTIAL = make it obvious." Not a tiny wiggle at the last second — a real, clear maneuver that leaves the stand-on vessel no doubt you\'ve seen them and you\'re moving. Three words: EARLY, BIG, CLEAR.'
+      },
+      {
+        num: '17',
+        title: 'Action by Stand-on Vessel',
+        key: 'Stand-on vessel: (i) shall MAINTAIN COURSE AND SPEED. (ii) MAY take action to avoid collision at any time (after giving notice). But: when collision becomes apparent because give-way vessel is NOT taking appropriate action — stand-on vessel MUST take action to avoid.',
+        trick: '🎯 "Stand-ON = stay ON." You maintain course and speed so the give-way vessel knows where you\'ll be. But this isn\'t a death pact. Once it\'s clear they\'re not acting, the rules say you MUST take action. \'Stand-on\' doesn\'t mean stand still and die.'
+      },
+      {
+        num: '18',
+        title: 'Responsibilities Between Vessels',
+        key: 'HIERARCHY (must keep clear of → most privileged): NUC → RAM → Constrained by Draft → Engaged in Fishing → Under Sail → Power-driven. Seaplanes and WIG craft: give way to all vessels and avoid impeding their passage.',
+        trick: '🏆 "Never Ridiculous Cats Feed Sleeping Pigs" = NUC, RAM, CBD, Fishing, Sailing, Power. The order makes sense: least maneuverable gets most protection. Power-driven is at the BOTTOM — engines give you the most options. NUC is at the TOP — no options at all.'
+      }
+    ]
+  },
+
+  stern: {
+    id: 'stern',
+    name: 'The Stern',
+    subtitle: 'Rule 13 — Overtaking (the arc)',
+    emoji: '⬡',
+    color: '#f0c040',
+    light: '#fef08a',
+    bg: 'rgba(240,192,64,0.1)',
+    rules: ['13'],
+    memory: '"Approaching from behind the 135° sternlight arc? You\'re overtaking. You give way — always, until you\'re past and clear."',
+    details: [
+      {
+        num: '13',
+        title: 'Overtaking — The Arc',
+        key: 'The 135° sternlight arc defines the overtaking zone. Any vessel coming from more than 22.5° abaft the other vessel\'s beam — from either side — is in this zone and is therefore overtaking. Rule 13 takes precedence over crossing rules (Rules 14-17). Once overtaking, always overtaking.',
+        trick: '🏁 "The white sternlight shines 135° behind the vessel. If you\'re in that white-light zone — you\'re overtaking." The stern is the memory hook: stand at the stern of a ship and look backwards — everything you see in that white-lit arc is a vessel that must yield to you. Turn it around: you\'re IN that arc behind another ship = you yield.'
+      }
+    ]
+  },
+
+  anchor: {
+    id: 'anchor',
+    name: 'The Anchor Locker',
+    subtitle: 'Rule 30 — Anchored Vessels & Vessels Aground',
+    emoji: '⚓',
+    color: '#64748b',
+    light: '#cbd5e1',
+    bg: 'rgba(100,116,139,0.1)',
+    rules: ['30'],
+    memory: '"At anchor: 1 white ball by day, 1 all-round white light by night. Big ship (≥50m): add a 2nd white light at the stern. Aground: add 3 reds + 3 balls."',
+    details: [
+      {
+        num: '30',
+        title: 'Anchored Vessels & Vessels Aground',
+        key: 'AT ANCHOR, day: one BLACK BALL shape in fore part. Night: one ALL-ROUND WHITE light in fore part. Vessels ≥50m: ALSO all-round white light at the stern (lower); may illuminate decks. AGROUND: shows anchor lights/shapes PLUS three all-round RED lights in a vertical line, PLUS three black ball shapes in a vertical line. Vessels <7m at anchor away from fairways: exempt.',
+        trick: '⚓ "1 white ball = 1 white light = at anchor. Small ship = 1 light (fore). Big ship = 2 lights (fore and aft, like runway lights). AGROUND adds 3 REDS and 3 BALLS — the \'3\' signals serious danger: I cannot move." Think: anchor = 1; aground = 1 + 3.'
+      }
+    ]
+  },
+
+  engine: {
+    id: 'engine',
+    name: 'The Engine Room',
+    subtitle: 'Rules 23–29 — Navigation Lights by Vessel Type',
+    emoji: '⚙️',
+    color: '#f97316',
+    light: '#fed7aa',
+    bg: 'rgba(249,115,22,0.1)',
+    rules: ['23', '24', '25', '26', '27', '28', '29'],
+    memory: '"Power = masthead on. No engine = no masthead. Special status = special lights. The engine room determines which lights you display."',
+    details: [
+      {
+        num: '23',
+        title: 'Power-driven Vessels Underway',
+        key: 'Masthead light (white, 225°) + sidelights (red/green) + sternlight (white, 135°). Vessels ≥50m: TWO masthead lights (forward lower, aft higher). Vessels <12m: may use all-round white + sidelights instead of masthead + sternlight.',
+        trick: '🚢 "Think: headlights (masthead) + indicator lights (sidelights) + tail light (sternlight)." Big ship ≥50m: TWO masthead lights — the aft one sits higher (so from dead ahead you\'d see one above the other: if they form a triangle with sidelights = crossing; if in a line = head-on).'
+      },
+      {
+        num: '24',
+        title: 'Towing & Pushing',
+        key: 'TOWING astern: extra masthead light(s) in a vertical line (2 total if tow ≤200m, 3 if tow >200m) + yellow towing light above sternlight. The TOW displays: sidelights + sternlight + yellow sternlight (instead of white). PUSHING: both vessels together show power-driven lights; forward vessel shows sidelights at forward end.',
+        trick: '🛥️ "Towing = extra whites UP TOP (masthead stack) + yellow at stern (the \'leash\' light). Long tow >200m = 3 masthead lights. The TOW ITSELF gets a yellow sternlight — yellow = attached to something." Count masthead lights: 2=tow ≤200m; 3=tow >200m.'
+      },
+      {
+        num: '25',
+        title: 'Sailing Vessels & Vessels Under Oars',
+        key: 'SAILING underway: sidelights + sternlight (may combine into a tricolor light at top of mast). May ALSO show all-round red (top) and all-round green (bottom) at mast, in ADDITION to sidelights and sternlight. Under oars: sidelights + sternlight, OR combined red-over-green all-round light, OR white flashlight. When using engine + sail: cone apex-down by day — classified as POWER-DRIVEN.',
+        trick: '⛵ "Sailing = NO masthead light. That white masthead = engine." Red over green (sailing at mast) = \'Christmas tree\' — optional extra. Sailing + motor = show cone shape + power lights. The cone says \'I\'m cheating with my engine!\''
+      },
+      {
+        num: '26',
+        title: 'Fishing Vessels',
+        key: 'TRAWLING: green all-round over white all-round + sidelights (if making way). OTHER FISHING: red all-round over white all-round + (if fishing gear extends >150m) a white all-round in that direction. A vessel \'fishing\' by trolling (lines only) is NOT a fishing vessel under COLREGS.',
+        trick: '🎣 "Trawling = GREEN over white. All other fishing = RED over white." Quick check: green on top = trawler (dragging nets below). Red on top = other fishing (pots, lines, longlines). Trolling = power vessel (no special lights). Gear sticking out? White light points the way.'
+      },
+      {
+        num: '27',
+        title: 'NUC & RAM Vessels',
+        key: 'NUC: two ALL-ROUND RED lights vertical (day: two black balls). RAM: three all-round lights vertical: RED–WHITE–RED (day: ball–diamond–ball). BOTH add sidelights + sternlight if making way. Special RAM case: dredging — red lights/balls on obstruction side, GREEN lights/white balls on safe/passable side.',
+        trick: '🔴 "NUC = 2 REDS (\'I\'m in trouble — stop\'). RAM = red–WHITE–red (a \'special\' sandwich — I\'m restricted but working). Dredge: RED = danger/obstruction side, GREEN = safe side to pass." NUC has no white; RAM has a white in the middle as the \'special status\' indicator.'
+      },
+      {
+        num: '28',
+        title: 'Vessels Constrained by Draft',
+        key: 'May display THREE ALL-ROUND RED lights in a vertical line (night), and/or a CYLINDER shape (day). Only POWER-DRIVEN vessels may claim this status. This is optional (\'may\') not mandatory in international COLREGS.',
+        trick: '🔴🔴🔴 "Three reds stacked = I\'m stuck in deep water, I cannot turn." The cylinder shape looks like a barrel — imagine a barrel floating upright saying \'full, can\'t move.\' Only power vessels get CBD status — a sailing vessel doesn\'t have this designation.'
+      },
+      {
+        num: '29',
+        title: 'Pilot Vessels',
+        key: 'White ALL-ROUND over red ALL-ROUND (at/near masthead position or sternlight) + sidelights and sternlight when underway. Anchor light when at anchor. Plus the vessel\'s own identification signal.',
+        trick: '⚪🔴 "Pilot = white hat over red jacket." White over red = pilot vessel. Easy visual: think of a harbour pilot wearing a white cap with a red-banded uniform. Look for white-over-red all-round lights. This is on top of the normal underway lights.'
+      }
+    ]
+  },
+
+  channels: {
+    id: 'channels',
+    name: 'The Water — Channels, TSS & Fog',
+    subtitle: 'Rules 9, 10, 19 — Navigation Context',
+    emoji: '🌊',
+    color: '#14b8a6',
+    light: '#99f6e4',
+    bg: 'rgba(20,184,166,0.1)',
+    rules: ['9', '10', '19'],
+    memory: '"Channel = drive right (starboard). TSS = stay in lane, cross at 90°. Fog = slow down, all bets off, LISTEN."',
+    details: [
+      {
+        num: '9',
+        title: 'Narrow Channels & Fairways',
+        key: 'Keep to STARBOARD side of narrow channel. Vessels <20m, sailing vessels, and fishing vessels SHALL NOT impede vessels that can ONLY navigate safely within the channel. Vessels crossing a narrow channel shall not impede channel traffic. No anchoring in a narrow channel unless necessary. Inland: overtaking requires signal exchange (two prolonged + 1 or 2 short blasts).',
+        trick: '🛣️ "Narrow channel = road. Drive on the RIGHT (starboard)." Small vessels, sailors, and fishing boats: you don\'t have right-of-way just because you\'re sailing — a large ship in a tight channel physically CANNOT move for you. Don\'t impede it. Think of a big truck in a narrow alley — the bike yields.'
+      },
+      {
+        num: '10',
+        title: 'Traffic Separation Schemes (TSS)',
+        key: 'Use the correct traffic LANE; proceed in the GENERAL DIRECTION of traffic flow. Vessels joining the lane should enter at a small angle from the side. Vessels CROSSING a lane: cross as nearly as practicable at RIGHT ANGLES to the traffic flow. Vessels <20m, sailing, and fishing should not impede lane vessels. Inshore traffic zones available for local traffic.',
+        trick: '🛣️ "TSS = maritime highway." Stay in your lane, go the right direction. Cross at 90° — the most visible, fastest, safest way to cross a busy lane. Joining from the side: like merging from a slip road. Crossing: like a pedestrian crossing — go straight across, not at an angle.'
+      },
+      {
+        num: '19',
+        title: 'Conduct in Restricted Visibility',
+        key: 'All vessels in or near restricted visibility: SAFE SPEED with engines ready for immediate maneuver. Rules 11–18 (in-sight rules: crossing, head-on, giving way) DO NOT APPLY — neither vessel has right-of-way. On hearing a fog signal apparently FORWARD OF THE BEAM: reduce to minimum steerage speed, navigate with extreme caution, be prepared to stop. On radar-only contact: avoid altering to PORT for vessels forward of beam (unless overtaking); avoid altering toward a vessel abeam or abaft the beam.',
+        trick: '🌫️ "In fog, nobody has right-of-way." Rules 11–18 only apply when vessels are \'in sight\' — fog removes that condition. Hear a fog signal ahead? SLOW DOWN immediately. Radar blip ahead-to-port? Turn starboard, not toward it. The two radar-specific turn rules: forward contact = don\'t go left; beam/astern contact = don\'t turn toward it.'
+      }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════
+//  STATE & SELECTION
+// ═══════════════════════════════════════════════════
+let activeZoneId = null;
+
+function selectZone(zoneId) {
+  const zone = ZONES[zoneId];
+  if (!zone) return;
+
+  // Clear previous active states
+  if (activeZoneId) {
+    document.querySelectorAll(`[data-zone="${activeZoneId}"]`).forEach(el => el.classList.remove('active'));
+  }
+
+  activeZoneId = zoneId;
+
+  // Mark all elements with this zone id as active
+  document.querySelectorAll(`[data-zone="${zoneId}"]`).forEach(el => el.classList.add('active'));
+
+  // Scroll active card into view (grid section)
+  const activeCard = document.querySelector(`.zone-card[data-zone="${zoneId}"]`);
+  if (activeCard) {
+    activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Update detail panel
+  document.getElementById('detail-empty').style.display = 'none';
+  const contentEl = document.getElementById('detail-content');
+  contentEl.classList.remove('show');
+  // Force reflow for animation replay
+  void contentEl.offsetWidth;
+  contentEl.innerHTML = buildDetailHTML(zone);
+  contentEl.classList.add('show');
+
+  // On mobile, scroll to detail panel
+  if (window.innerWidth < 960) {
+    document.querySelector('.detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function buildDetailHTML(zone) {
+  const rulesHTML = zone.details.map(r => `
+    <div class="rule-card">
+      <div class="rule-card-head">
+        <span class="rule-num-badge">Rule ${r.num}</span>
+        <span class="rule-title">${r.title}</span>
+      </div>
+      <div class="rule-body">
+        <div class="rule-key">${r.key}</div>
+        <div class="rule-trick">${r.trick}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const pillsHTML = zone.rules.map(r =>
+    `<span class="zone-pill" style="color:${zone.color}; border-color:${zone.color}40; background:${zone.bg}">Rule ${r}</span>`
+  ).join('');
+
+  return `
+    <div class="detail-badge" style="background:${zone.bg}; color:${zone.color}; border:1px solid ${zone.color}40">
+      ${zone.emoji} ${zone.name}
+    </div>
+    <div class="detail-zone-name">${zone.subtitle}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">${pillsHTML}</div>
+    <div class="memory-anchor">${zone.memory}</div>
+    <div class="rules-stack">${rulesHTML}</div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  BUILD ZONE GRID
+// ═══════════════════════════════════════════════════
+function buildGrid() {
+  const grid = document.getElementById('zones-grid');
+  const order = ['keel', 'lookout', 'bridge', 'bow', 'port', 'starboard', 'stern', 'lights', 'foghorn', 'anchor', 'engine', 'channels'];
+
+  order.forEach(zoneId => {
+    const zone = ZONES[zoneId];
+    if (!zone) return;
+
+    const pillsHTML = zone.rules.map(r =>
+      `<span class="zone-pill" style="color:${zone.color}; border-color:${zone.color}40; background:${zone.bg}">Rule ${r}</span>`
+    ).join('');
+
+    const card = document.createElement('div');
+    card.className = 'zone-card';
+    card.dataset.zone = zoneId;
+    card.innerHTML = `
+      <div class="zone-card-head">
+        <div class="zone-card-icon">${zone.emoji}</div>
+        <div>
+          <div class="zone-card-name" style="color:${zone.light}">${zone.name}</div>
+          <div class="zone-card-sub">${zone.subtitle}</div>
+        </div>
+      </div>
+      <div class="zone-pills">${pillsHTML}</div>
+      <div class="zone-card-memory">${zone.memory}</div>
+    `;
+    card.addEventListener('click', () => selectZone(zoneId));
+    grid.appendChild(card);
+  });
+}
+
+buildGrid();
+</script>
+</body>
+</html>
